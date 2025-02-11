@@ -75,7 +75,7 @@ const LoginComponent = () => {
       console.log(data.token);
       Alert.alert('Success', 'Login successful!');
       dispatchUserEvent('SIGNIN', {
-        info: 'USER',
+        info: data.data,
         token: data.token,
       });
     } catch (error) {

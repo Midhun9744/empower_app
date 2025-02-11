@@ -136,7 +136,7 @@ const RegisterComponent = () => {
       console.log(data.token);
       Alert.alert('Success', 'User registered successfully!');
       dispatchUserEvent('SIGNIN', {
-        info: 'USER',
+        info: data.data,
         token: data.token,
       });
     } catch (error) {

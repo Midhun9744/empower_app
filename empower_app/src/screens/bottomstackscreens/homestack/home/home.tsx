@@ -1,21 +1,21 @@
-import React from 'react';
-import {View, Text, Image, StyleSheet, ScrollView} from 'react-native';
+import React, {useContext} from 'react';
+import {Text, Image, StyleSheet, ScrollView} from 'react-native';
 import {Button} from 'react-native-paper';
 import Colors from '../../../../utils/colors';
+import {UserContext} from '../../../../context/userContext';
 
-export default function HomeScreen({navigation}) {
+const HomeScreen = () => {
+  const {user} = useContext(UserContext);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Top Image Section */}
       <Image
-        source={{
-          uri: 'https://source.unsplash.com/600x300/?community,women,empowerment',
-        }}
+        source={require('../../../../assets/images/logo.png')}
         style={styles.image}
       />
 
       {/* App Name Label */}
-      <Text style={styles.appName}>Way Made</Text>
+      <Text style={styles.appName}> Hi {user.info.F_NAME}</Text>
 
       {/* Welcome Message */}
       <Text style={styles.welcome}>Welcome to Way Made!</Text>
@@ -38,7 +38,7 @@ export default function HomeScreen({navigation}) {
       </Button>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -49,8 +49,8 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
-    resizeMode: 'cover',
+    height: '45%',
+    resizeMode: 'center',
   },
   appName: {
     fontSize: 26,
@@ -80,3 +80,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 });
+
+export default HomeScreen;
