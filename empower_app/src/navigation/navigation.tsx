@@ -5,8 +5,8 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ForgotComponent from '../screens/generalscreens/forgot/forgot';
 import HomeComponent from '../screens/bottomstackscreens/homestack/home/home';
-import SendOtpScreen from '../screens/bottomstackscreens/homestack/verify/send';
-import VerifyOtpScreen from '../screens/bottomstackscreens/homestack/verify/verify';
+// import SendOtpScreen from '../screens/bottomstackscreens/homestack/verify/send';
+// import VerifyOtpScreen from '../screens/bottomstackscreens/homestack/verify/verify';
 import SettingsListComponent from '../screens/bottomstackscreens/settingstack/settingsList/settingsList';
 import LoginComponent from '../screens/generalscreens/login/login';
 import RegisterComponent from '../screens/generalscreens/register/register';
@@ -138,8 +138,8 @@ export function HomeScreens() {
         headerTransparent: true,
       }}>
       <HomeStack.Screen name="Home" component={HomeComponent} />
-      <HomeStack.Screen name="Send" component={SendOtpScreen} />
-      <HomeStack.Screen name="Verify" component={VerifyOtpScreen} />
+      {/* <HomeStack.Screen name="Send" component={SendOtpScreen} />
+      <HomeStack.Screen name="Verify" component={VerifyOtpScreen} /> */}
     </HomeStack.Navigator>
   );
 }
