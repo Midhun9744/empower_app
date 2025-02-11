@@ -5,114 +5,88 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView} from 'react-native';
+import Colors from './src/utils/colors';
+import {NavigationContainer} from '@react-navigation/native';
+import {UserContext} from './src/context/userContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AuthScreens, RootScreens} from './src/navigation/navigation';
+import {Provider as PaperProvider} from 'react-native-paper';
+import SplashScreen from './src/screens/generalscreens/splash/splash';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+function App(): JSX.Element {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const storeData = async value => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem('@userToken', jsonValue);
+    } catch (e) {
+      // saving error
+    }
   };
 
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@userToken');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+    }
+  };
+
+  const dispatchUserEvent = (actionType: string, payload: any) => {
+    switch (actionType) {
+      case 'SIGNIN':
+        setUser(payload);
+        storeData(payload);
+        return;
+      case 'LOGOUT':
+        setUser(null);
+        storeData(null);
+        return;
+      default:
+        return;
+    }
+  };
+
+  useEffect(() => {
+    // Fetch token from AsyncStorage
+    const checkAuthToken = async () => {
+      try {
+        const userDetails = await getData();
+        if (userDetails) {
+          setUser(userDetails); // Set token in context
+        }
+      } catch (error) {
+        console.error('Error fetching token:', error);
+      }
+      // setIsLoading(false); // Stop showing Splash Screen
+      setTimeout(() => {
+        setIsLoading(false); // Stop showing Splash Screen
+      }, 3000);
+    };
+
+    checkAuthToken();
+  }, []);
+
+  if (isLoading) {
+    return <SplashScreen />; // Show Splash Screen while checking auth
+  }
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <PaperProvider>
+      <NavigationContainer>
+        <SafeAreaView style={{backgroundColor: Colors.primary, flex: 1}}>
+          <UserContext.Provider value={{user, dispatchUserEvent}}>
+            {user ? <RootScreens /> : <AuthScreens />}
+          </UserContext.Provider>
+        </SafeAreaView>
+      </NavigationContainer>
+    </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
