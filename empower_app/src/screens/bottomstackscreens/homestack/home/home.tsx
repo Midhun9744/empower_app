@@ -5,6 +5,7 @@ import Colors from '../../../../utils/colors';
 import {UserContext} from '../../../../context/userContext';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next';
 
 export type HomeStackParamList = {
   Send: {} | undefined;
@@ -13,6 +14,7 @@ export type HomeStackParamList = {
 
 const HomeScreen = () => {
   const {user} = useContext(UserContext);
+  const {t} = useTranslation();
   const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -26,23 +28,17 @@ const HomeScreen = () => {
       <Text style={styles.appName}> Hi {user.info.F_NAME}</Text>
 
       {/* Welcome Message */}
-      <Text style={styles.welcome}>Welcome to Way Made!</Text>
+      <Text style={styles.welcome}>{t('welcome')}!</Text>
 
       {/* Description */}
-      <Text style={styles.description}>
-        Way Made is a platform designed to **empower housewives** by helping
-        them **enhance their skills, sell their products, and educate others**.
-        Whether it's cooking, crafting, teaching, or any other talent, Way Made
-        provides the tools and support for women to **grow, share, and earn** in
-        a community-driven environment.
-      </Text>
+      <Text style={styles.description}>{t('desc')}</Text>
 
       {/* Get Started Button */}
       <Button
         mode="contained"
         style={styles.getStartedButton}
-        onPress={() => alert('More features are under development')}>
-        Get Started
+        onPress={() => alert(t('more'))}>
+        {t('start')}
       </Button>
     </ScrollView>
   );
@@ -57,7 +53,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: '45%',
+    height: '25%',
     resizeMode: 'center',
   },
   appName: {

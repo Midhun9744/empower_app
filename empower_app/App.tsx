@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthScreens, RootScreens} from './src/navigation/navigation';
 import {Provider as PaperProvider} from 'react-native-paper';
 import SplashScreen from './src/screens/generalscreens/splash/splash';
+import {LanguageProvider} from './src/context/languageContext';
 
 function App(): JSX.Element {
   const [user, setUser] = useState(null);
@@ -79,11 +80,13 @@ function App(): JSX.Element {
   return (
     <PaperProvider>
       <NavigationContainer>
-        <SafeAreaView style={{backgroundColor: Colors.primary, flex: 1}}>
-          <UserContext.Provider value={{user, dispatchUserEvent}}>
-            {user ? <RootScreens /> : <AuthScreens />}
-          </UserContext.Provider>
-        </SafeAreaView>
+        <LanguageProvider>
+          <SafeAreaView style={{backgroundColor: Colors.primary, flex: 1}}>
+            <UserContext.Provider value={{user, dispatchUserEvent}}>
+              {user ? <RootScreens /> : <AuthScreens />}
+            </UserContext.Provider>
+          </SafeAreaView>
+        </LanguageProvider>
       </NavigationContainer>
     </PaperProvider>
   );

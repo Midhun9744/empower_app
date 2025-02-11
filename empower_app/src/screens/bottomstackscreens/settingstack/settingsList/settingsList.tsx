@@ -10,10 +10,13 @@ import {List, Divider, Button, Appbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {UserContext} from '../../../../context/userContext';
 import Colors from '../../../../utils/colors';
+import {useTranslation} from 'react-i18next';
+import {LanguageContext} from '../../../../context/languageContext';
 
 const SettingsListComponent = () => {
   const {dispatchUserEvent} = useContext(UserContext);
-  const [language, setLanguage] = useState('English');
+  const {t} = useTranslation();
+  const {language, changeLanguage} = React.useContext(LanguageContext);
 
   return (
     <View style={styles.container}>
@@ -26,10 +29,10 @@ const SettingsListComponent = () => {
       <ScrollView contentContainerStyle={styles.menuContainer}>
         {/* Language Selection */}
         <TouchableOpacity
-          onPress={() => alert('Language selection coming soon!')}>
+          onPress={() => changeLanguage(language === 'en' ? 'ml' : 'en')}>
           <List.Item
-            title="Language"
-            description={language}
+            title={t('language')}
+            description={language === 'ml' ? 'മലയാളം' : 'English'}
             left={() => <Icon name="language" size={24} color="#007BFF" />}
             right={() => <Icon name="chevron-right" size={24} color="#777" />}
           />
@@ -66,7 +69,7 @@ const SettingsListComponent = () => {
           buttonColor="#904e4e"
           textColor="#fff"
           onPress={() => dispatchUserEvent('LOGOUT', {})}>
-          Logout
+          {t('logout')}
         </Button>
       </View>
     </View>
