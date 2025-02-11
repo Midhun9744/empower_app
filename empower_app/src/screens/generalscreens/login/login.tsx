@@ -6,12 +6,19 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Alert,
+  ScrollView,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import {Button} from 'react-native-paper';
 import {UserContext} from '../../../context/userContext';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Colors from '../../../utils/colors';
+import {BASE_URL} from '../../../utils/constants';
 
 export type AuthStackParamList = {
   Register: {} | undefined;
@@ -19,7 +26,7 @@ export type AuthStackParamList = {
 };
 
 const LoginComponent = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const nav = useNavigation<StackNavigationProp<AuthStackParamList>>();
@@ -27,63 +34,116 @@ const LoginComponent = () => {
 
   useEffect(() => {}, []);
 
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    try {
+      const requestBody = {
+        EMAIL: email,
+        PASSWORD: password,
+      };
+
+      const API_URL = BASE_URL + '/api/user/login';
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok) {
+        if (data.errors) {
+          // ✅ Display validation errors
+          const errorMessages = data.errors.map(err => err.msg).join('\n');
+          Alert.alert('Validation Error', errorMessages);
+        } else if (data.error) {
+          Alert.alert('Validation Error', data.error);
+        } else if (data.message) {
+          Alert.alert('Error', data.message);
+        } else {
+          Alert.alert('Error', 'Login failed');
+        }
+        return;
+      }
+
+      console.log(data);
+      console.log(data.token);
+      Alert.alert('Success', 'Login successful!');
+      dispatchUserEvent('SIGNIN', {
+        info: 'USER',
+        token: data.token,
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      console.error('Login Error:', error);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      {/* Top Image Section */}
-      <Image
-        source={require('../../../assets/images/logo.png')}
-        style={styles.image}
-      />
-      <Text style={styles.appName}>Way Made</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          <View style={styles.container}>
+            {/* Top Image Section */}
+            <Image
+              source={require('../../../assets/images/logo.png')}
+              style={styles.image}
+            />
+            <Text style={styles.appName}>Way Made</Text>
 
-      {/* Login Form */}
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Login</Text>
+            {/* Login Form */}
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Login</Text>
 
-        {/* Username Field */}
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          placeholderTextColor="#777"
-          value={username}
-          onChangeText={setUsername}
-        />
+              {/* Email Field */}
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor="#777"
+                value={email}
+                onChangeText={setEmail}
+              />
 
-        {/* Password Field */}
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#777"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+              {/* Password Field */}
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor="#777"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
 
-        {/* Forgot Password */}
-        <TouchableOpacity onPress={() => nav.navigate('Forgot', {})}>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        </TouchableOpacity>
+              {/* Forgot Password */}
+              <TouchableOpacity onPress={() => nav.navigate('Forgot', {})}>
+                <Text style={styles.forgotPassword}>Forgot Password?</Text>
+              </TouchableOpacity>
 
-        {/* Login Button */}
-        <Button
-          mode="contained"
-          buttonColor={Colors.primary}
-          onPress={() =>
-            dispatchUserEvent('SIGNIN', {
-              info: 'test',
-              token: 'test',
-            })
-          }
-          style={styles.loginButton}>
-          Login
-        </Button>
+              {/* Login Button */}
+              <Button
+                mode="contained"
+                buttonColor={Colors.primary}
+                onPress={handleLogin}
+                style={styles.loginButton}>
+                Login
+              </Button>
 
-        {/* Register Option */}
-        <TouchableOpacity onPress={() => nav.navigate('Register', {})}>
-          <Text style={styles.registerText}>Click here to register</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+              {/* Register Option */}
+              <TouchableOpacity onPress={() => nav.navigate('Register', {})}>
+                <Text style={styles.registerText}>Click here to register</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -110,6 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  scrollView: {flexGrow: 1, justifyContent: 'center', padding: 20},
   title: {
     fontSize: 24,
     fontWeight: 'bold',

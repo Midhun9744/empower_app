@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
+  Alert,
   StyleSheet,
   ScrollView,
 } from 'react-native';
@@ -14,6 +14,7 @@ import {UserContext} from '../../../context/userContext';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import Colors from '../../../utils/colors';
+import {BASE_URL} from '../../../utils/constants';
 
 export type AuthStackParamList = {
   Login: {} | undefined;
@@ -21,7 +22,7 @@ export type AuthStackParamList = {
 
 const RegisterComponent = () => {
   const nav = useNavigation<StackNavigationProp<AuthStackParamList>>();
-  //   const {dispatchUserEvent} = useContext(UserContext);
+  const {dispatchUserEvent} = useContext(UserContext);
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -30,7 +31,7 @@ const RegisterComponent = () => {
     confirmPassword: '',
     phone: '',
     dateOfBirth: new Date(),
-    gender: 'Select Gender',
+    gender: 'Female',
     address1: '',
     address2: '',
     city: '',
@@ -51,6 +52,96 @@ const RegisterComponent = () => {
     setShowDatePicker(false);
     if (selectedDate) {
       handleInputChange('dateOfBirth', selectedDate);
+    }
+  };
+
+  const formatDate = date => {
+    const d = new Date(date);
+    let day = d.getDate();
+    let month = d.getMonth() + 1; // Months are 0-based
+    let year = d.getFullYear();
+
+    return `${month.toString().padStart(2, '0')}-${day
+      .toString()
+      .padStart(2, '0')}-${year}`;
+  };
+
+  const handleRegister = async () => {
+    if (
+      !form.firstName ||
+      !form.lastName ||
+      !form.email ||
+      !form.password ||
+      !form.confirmPassword ||
+      !form.phone ||
+      !form.dateOfBirth ||
+      !form.gender ||
+      !form.address1 ||
+      !form.city ||
+      !form.state ||
+      !form.country ||
+      !form.pincode
+    ) {
+      Alert.alert('Error', 'All fields are required');
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    try {
+      const requestBody = {
+        F_NAME: form.firstName,
+        L_NAME: form.lastName,
+        EMAIL: form.email,
+        PASSWORD: form.password,
+        PHONE: form.phone,
+        DOB: formatDate(form.dateOfBirth), // Convert Date to DD-MM-YYYY format
+        GENDER: form.gender === 'Male' ? 'M' : 'F',
+        ADDRESS_LINE1: form.address1,
+        ADDRESS_LINE2: form.address2,
+        COUNTRY: form.country,
+        STATE: form.state,
+        CITY: form.city,
+        PINCODE: form.pincode,
+      };
+
+      const API_URL = BASE_URL + '/api/user/register';
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        if (data.errors) {
+          // ✅ Display validation errors
+          const errorMessages = data.errors.map(err => err.msg).join('\n');
+          Alert.alert('Validation Error', errorMessages);
+        } else if (data.error) {
+          Alert.alert('Validation Error', data.error);
+        } else if (data.message) {
+          Alert.alert('Error', data.message);
+        } else {
+          Alert.alert('Error', 'Registration failed');
+        }
+        return;
+      }
+
+      console.log(data);
+      console.log(data.token);
+      Alert.alert('Success', 'User registered successfully!');
+      dispatchUserEvent('SIGNIN', {
+        info: 'USER',
+        token: data.token,
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      console.error('Registration Error:', error);
     }
   };
 
@@ -215,7 +306,7 @@ const RegisterComponent = () => {
         {/* Register Button */}
         <TouchableOpacity
           style={styles.registerButton}
-          onPress={() => nav.navigate('Login', {})}>
+          onPress={handleRegister}>
           <Text style={styles.registerText}>Register</Text>
         </TouchableOpacity>
 
