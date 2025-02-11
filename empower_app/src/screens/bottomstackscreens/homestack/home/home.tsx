@@ -3,9 +3,17 @@ import {Text, Image, StyleSheet, ScrollView} from 'react-native';
 import {Button} from 'react-native-paper';
 import Colors from '../../../../utils/colors';
 import {UserContext} from '../../../../context/userContext';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+
+export type HomeStackParamList = {
+  Send: {} | undefined;
+  Verify: {} | undefined;
+};
 
 const HomeScreen = () => {
   const {user} = useContext(UserContext);
+  const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Top Image Section */}

@@ -7,7 +7,10 @@ import {
   Alert,
   StyleSheet,
   ScrollView,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 import {Menu, Button} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {UserContext} from '../../../context/userContext';
@@ -38,6 +41,8 @@ const RegisterComponent = () => {
     state: '',
     country: '',
     pincode: '',
+    latitude: null,
+    longitude: null,
   });
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -66,7 +71,49 @@ const RegisterComponent = () => {
       .padStart(2, '0')}-${year}`;
   };
 
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message: 'We need access to your location for registration.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } else {
+      return new Promise(resolve => {
+        Geolocation.requestAuthorization('whenInUse').then(result => {
+          resolve(result === 'granted');
+        });
+      });
+    }
+  };
+
+  const getLocation = async () => {
+    return new Promise((resolve, reject) => {
+      Geolocation.getCurrentPosition(
+        position => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        error => {
+          console.error('Geolocation error:', error);
+          reject(error);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    });
+  };
+
   const handleRegister = async () => {
+    console.log('1');
     if (
       !form.firstName ||
       !form.lastName ||
@@ -85,13 +132,30 @@ const RegisterComponent = () => {
       Alert.alert('Error', 'All fields are required');
       return;
     }
-
+    console.log('2');
     if (form.password !== form.confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
+    console.log('3');
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      Alert.alert('Error', 'Location permission is required for registration.');
+      return;
+    }
+
+    console.log('4');
 
     try {
+      console.log('5');
+      const location = await getLocation();
+      setForm(prevForm => ({
+        ...prevForm,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      }));
+      console.log('6');
+      console.log(location);
       const requestBody = {
         F_NAME: form.firstName,
         L_NAME: form.lastName,
@@ -99,13 +163,15 @@ const RegisterComponent = () => {
         PASSWORD: form.password,
         PHONE: form.phone,
         DOB: formatDate(form.dateOfBirth), // Convert Date to DD-MM-YYYY format
-        GENDER: form.gender === 'Male' ? 'M' : 'F',
+        GENDER: form.gender,
         ADDRESS_LINE1: form.address1,
         ADDRESS_LINE2: form.address2,
         COUNTRY: form.country,
         STATE: form.state,
         CITY: form.city,
         PINCODE: form.pincode,
+        LATITUDE: location.latitude,
+        LONGITUDE: location.longitude,
       };
 
       const API_URL = BASE_URL + '/api/user/register';
