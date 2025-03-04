@@ -54,6 +54,7 @@ function App(): JSX.Element {
   };
 
   useEffect(() => {
+    // console.log(AsyncStorage);
     // Fetch token from AsyncStorage
     const checkAuthToken = async () => {
       try {

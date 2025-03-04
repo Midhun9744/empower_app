@@ -11,12 +11,16 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {UserContext} from '../../../../context/userContext';
 import Colors from '../../../../utils/colors';
 import {useTranslation} from 'react-i18next';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
 import {LanguageContext} from '../../../../context/languageContext';
 
 const SettingsListComponent = () => {
   const {dispatchUserEvent} = useContext(UserContext);
   const {t} = useTranslation();
   const {language, changeLanguage} = React.useContext(LanguageContext);
+  
+ const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
 
   return (
     <View style={styles.container}>
@@ -48,6 +52,7 @@ const SettingsListComponent = () => {
           />
         </TouchableOpacity>
         <Divider />
+        
 
         {/* Terms & Policies */}
         <TouchableOpacity

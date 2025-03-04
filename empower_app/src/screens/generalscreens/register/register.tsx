@@ -33,7 +33,7 @@ const RegisterComponent = () => {
     password: '',
     confirmPassword: '',
     phone: '',
-    dateOfBirth: new Date(),
+    dateOfBirth: new Date('2000-01-01'),
     gender: 'Female',
     address1: '',
     address2: '',
@@ -113,7 +113,7 @@ const RegisterComponent = () => {
   };
 
   const handleRegister = async () => {
-    console.log('1');
+    // console.log('1');
     if (
       !form.firstName ||
       !form.lastName ||
@@ -132,30 +132,30 @@ const RegisterComponent = () => {
       Alert.alert('Error', 'All fields are required');
       return;
     }
-    console.log('2');
+    // console.log('2');
     if (form.password !== form.confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
-    console.log('3');
+    // console.log('3');
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
       Alert.alert('Error', 'Location permission is required for registration.');
       return;
     }
 
-    console.log('4');
+    // console.log('4');
 
     try {
-      console.log('5');
+      // console.log('5');
       const location = await getLocation();
       setForm(prevForm => ({
         ...prevForm,
         latitude: location.latitude,
         longitude: location.longitude,
       }));
-      console.log('6');
-      console.log(location);
+      // console.log('6');
+      // console.log(location);
       const requestBody = {
         F_NAME: form.firstName,
         L_NAME: form.lastName,

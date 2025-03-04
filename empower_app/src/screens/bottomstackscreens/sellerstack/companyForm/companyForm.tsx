@@ -7,38 +7,30 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 
-export type HomeStackParamList = {
-  Send: {} | undefined;
-  Verify: {} | undefined;
+export type SellerStackParamList = {
+    // CompanyForm: {} | undefined;
+    SellerDashboard: {} | undefined;
+
 };
 
-const HomeScreen = () => {
+const CompanyForm = () => {
   const {user} = useContext(UserContext);
   const {t} = useTranslation();
-  const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
+  const nav = useNavigation<StackNavigationProp<SellerStackParamList>>();
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Top Image Section */}
-      <Image
-        source={require('../../../../assets/images/logo.png')}
-        style={styles.image}
-      />
-
-      {/* App Name Label */}
-      <Text style={styles.appName}> Hi {user.info.F_NAME}</Text>
-
+    
       {/* Welcome Message */}
-      <Text style={styles.welcome}>{t('welcome')}!</Text>
+      <Text style={styles.welcome}>{t('welcome to company form')}!</Text>
 
-      {/* Description */}
-      <Text style={styles.description}>{t('desc')}</Text>
-
+    
       {/* Get Started Button */}
       <Button
         mode="contained"
         style={styles.getStartedButton}
         // onPress={() => alert(t('more'))}>
-        onPress={() => nav.navigate('Homestart')}>
+        onPress={() => nav.navigate('SellerDashboard')}>
         {t('start')}
       </Button>
     </ScrollView>
@@ -86,4 +78,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default CompanyForm;

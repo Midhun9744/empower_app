@@ -11,6 +11,12 @@ import SettingsListComponent from '../screens/bottomstackscreens/settingstack/se
 import LoginComponent from '../screens/generalscreens/login/login';
 import RegisterComponent from '../screens/generalscreens/register/register';
 import Colors from '../utils/colors';
+import HomestartComponent from '../screens/bottomstackscreens/homestack/homestart/homestart';
+import SellerRegisterComponent from '../screens/bottomstackscreens/sellerstack/sellerRegister/sellerRegister';
+import CompanyFormComponent from '../screens/bottomstackscreens/sellerstack/companyForm/companyForm';
+
+import SellerDashboardComponent from '../screens/bottomstackscreens/sellerstack/sellerDashboard/sellerDashboard';
+// import SellerAttachment from '../screens/bottomstackscreens/sellerstack/';
 
 const BottomTab = createBottomTabNavigator();
 
@@ -57,6 +63,20 @@ function BottomTabs() {
           tabBarIcon: ({focused, size}) => (
             <Icon
               name="user"
+              size={size}
+              color={focused ? Colors.primary : Colors.black}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="SellerAttachmentTab"
+        component={SellerAttachmentScreens}
+        options={{
+          title: 'seller',
+          tabBarIcon: ({focused, size}) => (
+            <Icon
+              name="user-plus"
               size={size}
               color={focused ? Colors.primary : Colors.black}
             />
@@ -138,6 +158,8 @@ export function HomeScreens() {
         headerTransparent: true,
       }}>
       <HomeStack.Screen name="Home" component={HomeComponent} />
+      <HomeStack.Screen name="Homestart" component={HomestartComponent} />
+
       {/* <HomeStack.Screen name="Send" component={SendOtpScreen} />
       <HomeStack.Screen name="Verify" component={VerifyOtpScreen} /> */}
     </HomeStack.Navigator>
@@ -173,6 +195,25 @@ export function SearchScreens() {
       }}>
       <SearchStack.Screen name="Home" component={HomeComponent} />
     </SearchStack.Navigator>
+  );
+}
+
+// New stack for SellerAttachment
+const SellerAttachmentStack = createStackNavigator();
+
+export function SellerAttachmentScreens() {
+  return (
+    <SellerAttachmentStack.Navigator
+      initialRouteName="SellerAttachment"
+      screenOptions={{
+        headerShown: true,
+        headerTitle: '',
+        headerTransparent: true,
+      }}>
+      <SellerAttachmentStack.Screen name="SellerRegister" component={SellerRegisterComponent} />
+      <SellerAttachmentStack.Screen name="CompanyForm" component={CompanyFormComponent} />
+      <SellerAttachmentStack.Screen name="SellerDashboard" component={SellerDashboardComponent} />
+    </SellerAttachmentStack.Navigator>
   );
 }
 
