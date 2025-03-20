@@ -1,38 +1,109 @@
-import React, {useContext} from 'react';
-import {Text, Image, StyleSheet, ScrollView} from 'react-native';
-import {Button} from 'react-native-paper';
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Colors from '../../../../utils/colors';
-import {UserContext} from '../../../../context/userContext';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {useNavigation} from '@react-navigation/native';
-import {useTranslation} from 'react-i18next';
+import { UserContext } from '../../../../context/userContext'; // Import UserContext
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
+import { BASE_URL } from '../../../../utils/constants';
 
 export type SellerStackParamList = {
-    // CompanyForm: {} | undefined;
-    SellerDashboard: {} | undefined;
-
+  SellerDashboard: {} | undefined;
 };
 
 const CompanyForm = () => {
-  const {user} = useContext(UserContext);
-  const {t} = useTranslation();
+  const { user } = useContext(UserContext); // Access user from context
   const nav = useNavigation<StackNavigationProp<SellerStackParamList>>();
+  
+  const [form, setForm] = useState({
+    companyName: '',
+    description: '',
+  });
+
+  const handleSubmit = async () => {
+    if (!form.companyName || !form.description) {
+      Alert.alert('Error', 'Company name and description are required');
+      return;
+    }
+
+    // if (!user || !user.id) {
+    //   Alert.alert('Error', 'User not authenticated');
+    //   return;
+    // }
+
+    try {
+      const requestBody = {
+        COMPANY_NAME: form.companyName,
+        DESCRIPTION: form.description,
+        USER_ID: user.info.USER_ID, // Get user ID from context
+      };
+
+      const API_URL = BASE_URL + '/api/seller/add'; // Adjust your API URL
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        if (data.errors) {
+          const errorMessages = data.errors.map(err => err.msg).join('\n');
+          Alert.alert('Validation Error', errorMessages);
+        } else if (data.error) {
+          Alert.alert('Validation Error', data.error);
+        } else if (data.message) {
+          Alert.alert('Error', data.message);
+        } else {
+          Alert.alert('Error', 'Registration failed');
+        }
+        return;
+      }
+
+      Alert.alert('Success', 'Company registered successfully!');
+      nav.navigate('SellerDashboard');
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      console.error('Company Registration Error:', error);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Top Image Section */}
-    
-      {/* Welcome Message */}
-      <Text style={styles.welcome}>{t('welcome to company form')}!</Text>
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Register Your Company</Text>
 
-    
-      {/* Get Started Button */}
-      <Button
-        mode="contained"
-        style={styles.getStartedButton}
-        // onPress={() => alert(t('more'))}>
-        onPress={() => nav.navigate('SellerDashboard')}>
-        {t('start')}
-      </Button>
+        <TextInput
+          style={styles.input}
+          placeholder="Company Name"
+          placeholderTextColor="#777"
+          value={form.companyName}
+          onChangeText={text => setForm({ ...form, companyName: text })}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Description"
+          placeholderTextColor="#777"
+          value={form.description}
+          onChangeText={text => setForm({ ...form, description: text })}
+        />
+
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={handleSubmit}>
+          <Text style={styles.registerText}>Register</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -41,40 +112,39 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+  },
+  formContainer: {
     padding: 20,
+    alignItems: 'center',
   },
-  image: {
-    width: '100%',
-    height: '25%',
-    resizeMode: 'center',
-  },
-  appName: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: Colors.primary,
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  welcome: {
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 20,
-    textAlign: 'center',
-    color: '#333',
+    marginBottom: 20,
   },
-  description: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#555',
-    marginTop: 10,
-    paddingHorizontal: 10,
-    lineHeight: 22,
-  },
-  getStartedButton: {
-    marginTop: 20,
-    width: '80%',
+  input: {
+    width: '100%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    marginBottom: 15,
+    justifyContent: 'center',
+  },
+  registerButton: {
+    width: '100%',
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  registerText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

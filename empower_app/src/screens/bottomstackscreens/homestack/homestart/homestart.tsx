@@ -1,157 +1,173 @@
-import React, {useContext} from 'react';
-import { View, Text, TextInput, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Button, Card } from 'react-native-paper';
-import Colors from '../../../../utils/colors';
-import {UserContext} from '../../../../context/userContext';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {useNavigation} from '@react-navigation/native';
-import {useTranslation} from 'react-i18next';
-import { blue } from 'react-native-reanimated/lib/typescript/Colors';
+import React from 'react';
+import { View, Text, StyleSheet, TextInput, ScrollView, Image, TouchableOpacity, Animated } from 'react-native';
+import { Button } from 'react-native-paper';
+import { BASE_URL } from '../../../../utils/constants';
 
-// const restaurants = [
-  // {
-  //   name: 'Pizza Street Restaurant',
-  //   image: '',
-  //   price: '$25 min',
-  // },
-  // {
-  //   name: 'Crispy Chicken Restaurant',
-  //   image: 'https://via.placeholder.com/300',
-  //   price: '$18 min',
-  // },
-// ];
+const  Homestart = () => {
+  const products = [
+    { id: 1, name: 'Homemade Cake', price: 499, image: 'https://via.placeholder.com/150' },
+    { id: 2, name: 'Handmade Soap', price: 199, image: 'https://via.placeholder.com/150' },
+    { id: 3, name: 'Natural Oil', price: 299, image: 'https://via.placeholder.com/150' },
+    { id: 4, name: 'Organic Lotion', price: 399, image: 'https://via.placeholder.com/150' },
+    { id: 5, name: 'Hand-stitched Cloth', price: 999, image: 'https://via.placeholder.com/150' },
+  ];
 
-const Homestart = () => {
-  const { t } = useTranslation();
-  const navigation = useNavigation();
-   const {user} = useContext(UserContext);
-     const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
+  const recentlyViewed = [
+    { id: 6, name: 'Herbal Shampoo', price: 299, image: 'https://via.placeholder.com/150' },
+    { id: 7, name: 'Natural Honey', price: 399, image: 'https://via.placeholder.com/150' },
+  ];
+
+  const popularItems = [
+    { id: 8, name: 'Aloe Vera Gel', price: 199, image: 'https://via.placeholder.com/150' },
+    { id: 9, name: 'Handcrafted Mug', price: 499, image: 'https://via.placeholder.com/150' },
+  ];
+
+  const scrollX = new Animated.Value(0);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>{t('hello')}{user.info.F_NAME}{'\n'}</Text>
-    
-
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        <Text style={styles.waymadeText}>Waymade</Text>
         <View style={styles.searchContainer}>
-          <TextInput
-            placeholder={t('what_do_you_want')}
-            style={styles.searchInput}
+          <Text style={styles.logo}>🔍</Text>
+          <TextInput 
+            placeholder="Search for Products..."
+            placeholderTextColor="#888"
+            style={styles.searchBox}
           />
-          <Button mode="contained-tonal" style={styles.searchButton}>🔍</Button>
         </View>
       </View>
-      
-      {/* <Button
-        mode="contained"
-        style={styles.getStartedButton}
-        onPress={() => navigation.navigate('HomePage')}>
-        {t('start')}
-      </Button> */}
-
-      <Text style={styles.sectionTitle}>{t('near by ')}</Text>
-      {restaurants.map((restaurant, index) => (
-        <Card key={index} style={styles.card}>
-          <Image
-            source={{ uri: restaurant.image || 'https://via.placeholder.com/300' }}
-            style={styles.image}
-          />
-          <View style={styles.cardContent}>
-            <Text style={styles.restaurantName}>{restaurant.name}</Text>
-            <Text style={styles.restaurantPrice}>Min: {restaurant.price}</Text>
-            <TouchableOpacity style={styles.orderButton}>
-              <Text style={styles.orderButtonText}>{t('order_now')}</Text>
+      <ScrollView style={styles.scrollContainer}>
+        <Text style={styles.sectionTitle}>Top Deals</Text>
+        <Animated.ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          style={styles.horizontalScroll} 
+          pagingEnabled 
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            { useNativeDriver: false }
+          )}
+        >
+          {products.map((product) => (
+            <TouchableOpacity key={product.id} style={styles.card}>
+              <Image source={{ uri: product.image }} style={styles.productImage} />
+              <Text style={styles.productText}>{product.name}</Text>
+              <Text style={styles.priceText}>₹{product.price}</Text>
             </TouchableOpacity>
-          </View>
-        </Card>
-      ))}
-    </ScrollView>
+          ))}
+        </Animated.ScrollView>
+
+        <Text style={styles.sectionTitle}>Recently Viewed</Text>
+        <View style={styles.boxContainer}>
+          {recentlyViewed.map((item) => (
+            <TouchableOpacity key={item.id} style={styles.boxCard}>
+              <Image source={{ uri: item.image }} style={styles.productImage} />
+              <Text style={styles.productText}>{item.name}</Text>
+              <Text style={styles.priceText}>₹{item.price}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Text style={styles.sectionTitle}>Popular Items</Text>
+        <View style={styles.boxContainer}>
+          {popularItems.map((item) => (
+            <TouchableOpacity key={item.id} style={styles.boxCard}>
+              <Image source={{ uri: item.image }} style={styles.productImage} />
+              <Text style={styles.productText}>{item.name}</Text>
+              <Text style={styles.priceText}>₹{item.price}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#f7f7f7',
+    flex: 1,
+    backgroundColor: '#F5F5F5',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
+  topContainer: {
+    paddingTop: 40,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    backgroundColor: '#6200EE',
   },
-  greeting: {
-    fontSize: 20,
+  waymadeText: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginTop:10,
-    padding:10,
+    color: '#FFF',
+    marginBottom: 10,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
-
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 10,
   },
-  searchInput: {
-    // flex: 1,
-    marginRight: 2,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-
+  logo: {
+    marginRight: 10,
+    fontSize: 20,
+    color: '#6200EE',
   },
-  searchButton: {
-    paddingHorizontal:1,
-    borderRadius: 70,
-    height:40,
-    
+  searchBox: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
   },
-  getStartedButton: {
-    marginBottom: 20,
-    backgroundColor: '#f5a623',
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 8,
+  scrollContainer: {
+    padding: 20,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  horizontalScroll: {
+    marginBottom: 20,
   },
   card: {
-    marginBottom: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  cardContent: {
-    padding: 16,
-  },
-  restaurantName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  restaurantPrice: {
-    fontSize: 14,
-    color: '#777',
-  },
-  orderButton: {
-    marginTop: 16,
-    backgroundColor: '#f5a623',
-    paddingVertical: 12,
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    marginRight: 15,
+    padding: 10,
     alignItems: 'center',
-    borderRadius: 8,
+    width: 150,
+    elevation: 5,
   },
-  orderButtonText: {
-    color: '#fff',
+  productImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
+  },
+  productText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  priceText: {
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#6200EE',
+  },
+  boxContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  boxCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    width: '48%',
+    alignItems: 'center',
+    elevation: 5,
   },
 });
 
-export default Homestart;
+export default  Homestart;

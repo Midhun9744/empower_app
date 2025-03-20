@@ -7,41 +7,22 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 
-export type HomeStackParamList = {
+export type ProfileStackParamList = {
   Send: {} | undefined;
   Verify: {} | undefined;
-  Homestart: {} | undefined;
 };
 
-const HomeScreen = () => {
+const Wishlist = () => {
   const {user} = useContext(UserContext);
   const {t} = useTranslation();
-  const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
+  const nav = useNavigation<StackNavigationProp<ProfileStackParamList>>();
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Top Image Section */}
-      <Image
-        source={require('../../../../assets/images/logo.png')}
-        style={styles.image}
-      />
-
-      {/* App Name Label */}
-      <Text style={styles.appName}> Hi {user.info.F_NAME}</Text>
-
+      
       {/* Welcome Message */}
-      <Text style={styles.welcome}>{t('welcome')}!</Text>
+      <Text style={styles.welcome}>{t('wishlist')}!</Text>
 
-      {/* Description */}
-      <Text style={styles.description}>{t('desc')}</Text>
-
-      {/* Get Started Button */}
-      <Button
-        mode="contained"
-        style={styles.getStartedButton}
-        // onPress={() => alert(t('more'))}>
-        onPress={() => nav.navigate('Homestart')}>
-        {t('start')}
-      </Button>
+      
     </ScrollView>
   );
 };
@@ -87,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default Wishlist;

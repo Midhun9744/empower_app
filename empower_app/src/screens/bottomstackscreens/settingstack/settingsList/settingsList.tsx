@@ -15,12 +15,21 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import {LanguageContext} from '../../../../context/languageContext';
 
+
+export type SettingStackParamList = {
+  Faq: {} | undefined;
+  Wishlist: {} | undefined;
+  Loan: {} | undefined;
+  
+  
+};
+
 const SettingsListComponent = () => {
   const {dispatchUserEvent} = useContext(UserContext);
   const {t} = useTranslation();
   const {language, changeLanguage} = React.useContext(LanguageContext);
   
- const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
+ const nav = useNavigation<StackNavigationProp<SettingStackParamList>>();
 
   return (
     <View style={styles.container}>
@@ -43,8 +52,31 @@ const SettingsListComponent = () => {
         </TouchableOpacity>
         <Divider />
 
+        {/* Whishlist */}
+        <TouchableOpacity onPress={() => nav.navigate('Wishlist')}>
+            {t('start')}
+          <List.Item
+            title="wishlist"
+            left={() => <Icon name="star" size={24} color="#007BFF" />}
+            right={() => <Icon name="chevron-right" size={24} color="#777" />}
+          />
+        </TouchableOpacity>
+        <Divider />
+
+        {/* Loan */}
+        <TouchableOpacity onPress={() => nav.navigate('Loan')}>
+            {t('start')}
+          <List.Item
+            title="loan"
+            left={() => <Icon name=" " size={24} color="#007BFF" />}
+            right={() => <Icon name="chevron-right" size={24} color="#777" />}
+          />
+        </TouchableOpacity>
+        <Divider />
+
         {/* FAQ */}
-        <TouchableOpacity onPress={() => alert('FAQ section coming soon!')}>
+        <TouchableOpacity onPress={() => nav.navigate('Faq')}>
+            {t('start')}
           <List.Item
             title="FAQ"
             left={() => <Icon name="help-outline" size={24} color="#007BFF" />}

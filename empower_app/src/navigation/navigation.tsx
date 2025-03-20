@@ -8,14 +8,24 @@ import HomeComponent from '../screens/bottomstackscreens/homestack/home/home';
 // import SendOtpScreen from '../screens/bottomstackscreens/homestack/verify/send';
 // import VerifyOtpScreen from '../screens/bottomstackscreens/homestack/verify/verify';
 import SettingsListComponent from '../screens/bottomstackscreens/settingstack/settingsList/settingsList';
+import FaqComponent from '../screens/bottomstackscreens/settingstack/faq/faq';
+import WishlistComponent from '../screens/bottomstackscreens/settingstack/wishlist/wishlist';
+import LoanComponent from '../screens/bottomstackscreens/settingstack/loan/loan';
 import LoginComponent from '../screens/generalscreens/login/login';
 import RegisterComponent from '../screens/generalscreens/register/register';
 import Colors from '../utils/colors';
 import HomestartComponent from '../screens/bottomstackscreens/homestack/homestart/homestart';
 import SellerRegisterComponent from '../screens/bottomstackscreens/sellerstack/sellerRegister/sellerRegister';
 import CompanyFormComponent from '../screens/bottomstackscreens/sellerstack/companyForm/companyForm';
-
 import SellerDashboardComponent from '../screens/bottomstackscreens/sellerstack/sellerDashboard/sellerDashboard';
+import ProfileInfoComponent from '../screens/bottomstackscreens/sellerstack/profileInfo/profileInfo';
+import AddProductComponent from '../screens/bottomstackscreens/sellerstack/addProduct/addProduct';
+import ViewProductComponent from '../screens/bottomstackscreens/sellerstack/viewProduct/viewProduct';
+import AccountViewComponent from '../screens/bottomstackscreens/accountstack/accountview/accountview';
+import EditProfileComponent from '../screens/bottomstackscreens/accountstack/editprofile/editprofile';
+// import CartComponent from '../screens/bottomstackscreens/orderstack/cart/cart';
+import LearnComponent from '../screens/bottomstackscreens/learnstack/learn/learn';
+
 // import SellerAttachment from '../screens/bottomstackscreens/sellerstack/';
 
 const BottomTab = createBottomTabNavigator();
@@ -76,7 +86,7 @@ function BottomTabs() {
           title: 'seller',
           tabBarIcon: ({focused, size}) => (
             <Icon
-              name="user-plus"
+              name="credit-card"
               size={size}
               color={focused ? Colors.primary : Colors.black}
             />
@@ -177,7 +187,8 @@ export function ExploreScreens() {
         headerTitle: '',
         headerTransparent: true,
       }}>
-      <ExploreStack.Screen name="Home" component={HomeComponent} />
+      {/* <ExploreStack.Screen name="Home" component={HomeComponent} /> */}
+      <ExploreStack.Screen name="Cart" component={CartComponent} />
     </ExploreStack.Navigator>
   );
 }
@@ -193,7 +204,10 @@ export function SearchScreens() {
         headerTitle: '',
         headerTransparent: true,
       }}>
-      <SearchStack.Screen name="Home" component={HomeComponent} />
+      {/* <SearchStack.Screen name="Home" component={HomeComponent} /> */}
+      <SearchStack.Screen name="AccountView" component={AccountViewComponent} />
+      <SearchStack.Screen name="EditProfile" component={EditProfileComponent} />
+
     </SearchStack.Navigator>
   );
 }
@@ -213,6 +227,9 @@ export function SellerAttachmentScreens() {
       <SellerAttachmentStack.Screen name="SellerRegister" component={SellerRegisterComponent} />
       <SellerAttachmentStack.Screen name="CompanyForm" component={CompanyFormComponent} />
       <SellerAttachmentStack.Screen name="SellerDashboard" component={SellerDashboardComponent} />
+      <SellerAttachmentStack.Screen name="ProfileInfo" component={ProfileInfoComponent} />
+      <SellerAttachmentStack.Screen name="AddProduct" component={AddProductComponent} />
+      <SellerAttachmentStack.Screen name="ViewProduct" component={ViewProductComponent} />
     </SellerAttachmentStack.Navigator>
   );
 }
@@ -228,7 +245,8 @@ export function FolderScreens() {
         headerTitle: '',
         headerTransparent: true,
       }}>
-      <FolderStack.Screen name="Home" component={HomeComponent} />
+      {/* <FolderStack.Screen name="Home" component={HomeComponent} /> */}
+      <FolderStack.Screen name="Learn" component={LearnComponent} />
     </FolderStack.Navigator>
   );
 }
@@ -247,6 +265,18 @@ export function ProfileScreens() {
       <ProfileStack.Screen
         name="SettingList"
         component={SettingsListComponent}
+      />
+      <ProfileStack.Screen
+        name="Faq"
+        component={FaqComponent}
+      />
+      <ProfileStack.Screen
+        name="Wishlist"
+        component={WishlistComponent}
+      />
+      <ProfileStack.Screen
+        name="Loan"
+        component={LoanComponent}
       />
     </ProfileStack.Navigator>
   );
