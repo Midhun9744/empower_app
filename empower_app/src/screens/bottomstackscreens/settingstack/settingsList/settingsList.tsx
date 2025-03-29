@@ -57,7 +57,7 @@ const SettingsListComponent = () => {
             {t('start')}
           <List.Item
             title="wishlist"
-            left={() => <Icon name="star" size={24} color="#007BFF" />}
+            left={() => <Icon name="bookmark" size={24} color="#007BFF" />}
             right={() => <Icon name="chevron-right" size={24} color="#777" />}
           />
         </TouchableOpacity>
@@ -68,7 +68,7 @@ const SettingsListComponent = () => {
             {t('start')}
           <List.Item
             title="loan"
-            left={() => <Icon name=" " size={24} color="#007BFF" />}
+            left={() => <Icon name="money" size={24} color="#007BFF" />}
             right={() => <Icon name="chevron-right" size={24} color="#777" />}
           />
         </TouchableOpacity>

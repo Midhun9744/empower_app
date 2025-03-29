@@ -17,6 +17,11 @@ const HomeScreen = () => {
   const {user} = useContext(UserContext);
   const {t} = useTranslation();
   const nav = useNavigation<StackNavigationProp<HomeStackParamList>>();
+
+  // Check if user and user.info are defined before accessing F_NAME
+  const userName = user && user.info ? user.info.F_NAME : 'User';
+  console.log(user.info);
+  console.log(user.info.F_NAME);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Top Image Section */}
@@ -26,7 +31,7 @@ const HomeScreen = () => {
       />
 
       {/* App Name Label */}
-      <Text style={styles.appName}> Hi {user.info.F_NAME}</Text>
+      <Text style={styles.appName}> Hi {userName}</Text>
 
       {/* Welcome Message */}
       <Text style={styles.welcome}>{t('welcome')}!</Text>
@@ -38,7 +43,6 @@ const HomeScreen = () => {
       <Button
         mode="contained"
         style={styles.getStartedButton}
-        // onPress={() => alert(t('more'))}>
         onPress={() => nav.navigate('Homestart')}>
         {t('start')}
       </Button>

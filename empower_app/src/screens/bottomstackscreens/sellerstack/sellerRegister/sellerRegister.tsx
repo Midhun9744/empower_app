@@ -1,24 +1,10 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView } from 'react-native';
-import { Button } from 'react-native-paper';
-import Colors from '../../../../utils/colors';
+import React, { useContext, useEffect } from 'react';
+import { Text, StyleSheet, ScrollView } from 'react-native';
 import { UserContext } from '../../../../context/userContext';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
-
-// Simulating an API request to check if the user is a seller
-const checkIfUserIsSeller = async (USER_ID) => {
-  // Replace with your actual API request logic
-  const sellerData = [
-    { userId: 1 }, // Example seller record
-    // { userId: 2 }, // Example seller record
-  ];
-
-  // Check if the userId exists in the seller data
-  return sellerData.some((seller) => seller.USER_ID === USER_ID);
-};
 
 // Defining navigation params type for navigation
 export type SellerStackParamList = {
@@ -28,34 +14,21 @@ export type SellerStackParamList = {
 
 const SellerRegister = () => {
   const { user } = useContext(UserContext); // Access user context to get the current user
-  const [isSeller, setIsSeller] = useState<boolean | null>(null); // Local state to store if the user is a seller
   const { t } = useTranslation(); // Translation hook for multi-language support
   const nav = useNavigation<StackNavigationProp<SellerStackParamList>>(); // Navigation hook
 
-  // Check if the user is a seller when the component mounts
+  // Check the user info on component mount and navigate accordingly
   useEffect(() => {
-    const fetchSellerStatus = async () => {
-      if (user && user.info.USER_ID) {
-        const sellerStatus = await checkIfUserIsSeller(user.USER_ID); // Query the Seller table (via API)
-        setIsSeller(sellerStatus); // Update state based on result
-      }
-    };
+    const sellerId = user.info.seller_id;
 
-    fetchSellerStatus(); // Call function to check seller status
-  }, [user]);
-
-  // Navigate based on user seller status
-  const navigateToNextScreen = () => {
-    if (isSeller === null) {
-      return; // If still loading seller status, don't navigate yet
-    }
-
-    if (isSeller) {
-      nav.navigate('SellerDashboard'); // Navigate to seller dashboard if user is a seller
+    if (sellerId === null || sellerId === undefined) {
+      // If sellerId doesn't exist, navigate to the CompanyForm
+      nav.navigate('CompanyForm');
     } else {
-      nav.navigate('CompanyForm'); // Navigate to company form if user is not a seller
+      // If sellerId exists, navigate to the SellerDashboard and replace current screen
+      nav.replace('SellerDashboard');
     }
-  };
+  }, [user, nav]); // Dependency on user to re-run the effect when user info changes
 
   return (
     <LinearGradient
@@ -74,17 +47,6 @@ const SellerRegister = () => {
         >
           <Text style={styles.title}>{t('join_marketplace')}</Text>
           <Text style={styles.description}>{t('start_selling_today')}</Text>
-
-          {/* Button that triggers navigation */}
-          <Button
-            mode="contained"
-            style={styles.getStartedButton}
-            onPress={navigateToNextScreen}
-            disabled={isSeller === null} // Disable the button while checking
-          >
-            {t('start')}
-          </Button>
-
         </LinearGradient>
       </ScrollView>
     </LinearGradient>
@@ -94,7 +56,7 @@ const SellerRegister = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center', 
+    justifyContent: 'center',
     paddingHorizontal: 20,
   },
   scrollContainer: {
@@ -126,18 +88,9 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#00000',
+    color: '#000000',
     marginBottom: 20,
     lineHeight: 22,
-  },
-  getStartedButton: {
-    marginTop: 20,
-    width: '80%',
-    paddingVertical: 12,
-    color: '#000000',
-    backgroundColor: '#000000',
-    borderRadius: 8,
-    elevation: 3,
   },
 });
 

@@ -20,7 +20,7 @@ const Learn = () => {
     <ScrollView contentContainerStyle={styles.container}>
       
       {/* Welcome Message */}
-      <Text style={styles.welcome}>{t('welcome to learning path ')}!</Text>
+      <Text style={styles.welcome}>{t('welcome to learning path  ')}!</Text>
 
       
     </ScrollView>

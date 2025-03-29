@@ -60,9 +60,9 @@ const LoginComponent = () => {
         if (data.errors) {
           // ✅ Display validation errors
           const errorMessages = data.errors.map(err => err.msg).join('\n');
-          Alert.alert('Validation Error', errorMessages);
+          Alert.alert('Validation Error 1', errorMessages);
         } else if (data.error) {
-          Alert.alert('Validation Error', data.error);
+          Alert.alert('Validation Error 2', data.error);
         } else if (data.message) {
           Alert.alert('Error', data.message);
         } else {
@@ -70,20 +70,21 @@ const LoginComponent = () => {
         }
         return;
       }
-
+      // console.log(user.info);
       console.log(data);
       console.log(data.token);
       Alert.alert('Success', 'Login successful!');
       dispatchUserEvent('SIGNIN', {
         info: data.data,
         token: data.token,
+      
       });
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
       console.error('Login Error:', error);
     }
   };
-
+ 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

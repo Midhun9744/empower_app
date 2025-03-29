@@ -20,6 +20,7 @@ export type AccountStackParamList = {
   Send: {} | undefined;
   Verify: {} | undefined;
   EditProfile: {} | undefined;
+  AccountView: {} | undefined;
 };
 
 const EditProfile = () => {
@@ -49,6 +50,7 @@ const EditProfile = () => {
   };
 
   const handleUpdateProfile = async () => {
+    console.log(user.info);
     if (!form.firstName || !form.lastName || !form.phone) {
       Alert.alert('Error', 'All fields are required!');
       return;
@@ -63,32 +65,47 @@ const EditProfile = () => {
         PHONE: form.phone,
       };
 
-      const API_URL = `${BASE_URL}/api/user/update/${user.info.USER_ID}`;
+      const API_URL = BASE_URL+`/api/user/update/${user.info.USER_ID}`;
 
       const response = await fetch(API_URL, {
-        method: 'PUT',
+        method: 'PUT', // Or POST depending on your API
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${user.token}`,
+          // Add any necessary authorization headers here
         },
         body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
-
+      console.log(data);
       if (!response.ok) {
-        Alert.alert('Error', data.message || 'Profile update failed.');
-      } else {
-        Alert.alert('Success', 'Profile updated successfully!');
-        dispatchUserEvent('UPDATE_PROFILE', { info: data.data, token: data.token });
-        nav.navigate('EditProfile');
+        if (data.errors) {
+          // ✅ Display validation errors
+          const errorMessages = data.errors.map(err => err.msg).join('\n');
+          Alert.alert('Validation Error', errorMessages);
+        } else if (data.error) {
+          Alert.alert('Error', data.error);
+        } else if (data.message) {
+          Alert.alert('Error', data.message);
+        } else {
+          Alert.alert('Error', 'Profile update failed');
+        }
+        return;
       }
-    } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
-      console.error('Update Profile Error:', error);
-    } finally {
-      setLoading(false);
-    }
+
+      console.log(data);
+           console.log(data.token);
+           Alert.alert('Success', 'profile updated successful!');
+           dispatchUserEvent('UPDATE', {
+             info: data.data,
+             token: data.token,
+           });
+           nav.navigate('AccountView'); 
+         } catch (error) {
+           Alert.alert('Error', 'Something went wrong. Please try again later.');
+          //  console.error('Login Error:', error);
+         }
+         console.log(user);
   };
 
   return (

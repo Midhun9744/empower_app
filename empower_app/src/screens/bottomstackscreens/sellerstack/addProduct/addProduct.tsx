@@ -53,7 +53,7 @@ const AddProduct = () => {
         PRICE: form.price,
         DESCRIPTION: form.description,
         QUANTITY: form.quantity,
-        SELLER_ID: user.info.seller_id, // Get user ID from context
+        SELLER_ID: user.info.seller_id, // Get seller ID from context
       };
 
       const API_URL = BASE_URL + '/api/product/add';
@@ -70,9 +70,9 @@ const AddProduct = () => {
           const errorMessages = data.errors.map((err: any) => err.msg).join('\n');
           Alert.alert('Validation Error', errorMessages);
         } else if (data.error) {
-          Alert.alert('Error', data.error);
+          Alert.alert('Error 1', data.error);
         } else if (data.message) {
-          Alert.alert('Error', data.message);
+          Alert.alert('Error 2', data.message);
         } else {
           Alert.alert('Error', 'Product addition failed');
         }
@@ -82,8 +82,9 @@ const AddProduct = () => {
       Alert.alert('Success', 'Product added successfully!');
       nav.navigate('SellerDashboard'); // Navigate to Seller Dashboard after success
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
-      console.error('Product Addition Error:', error);
+      console.error('Product Addition Error:', error); 
+      Alert.alert('Error', 'Something went wrong. Please try again later  .');
+      // console.error('Product Addition Error:', error);
     }
   };
 
@@ -93,63 +94,62 @@ const AddProduct = () => {
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-     >
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.formContainer}>
+          {/* Image at the top */}
+          <Image
+            source={require('../../../../assets/images/avatar.png')} // Replace with your image URL
+            style={styles.image}
+          />
 
-     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.formContainer}>
-        {/* Image at the top */}
-        <Image 
-          source={require('../../../../assets/images/avatar.png')} // Replace with your image URL
-          style={styles.image}
-        />
-        
-        <Text style={styles.title}>Add Product</Text>
+          <Text style={styles.title}>Add Product</Text>
 
-        {/* Product Name Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Product Name"
-          placeholderTextColor="#777"
-          value={form.name}
-          onChangeText={(text) => handleInputChange('name', text)}
-        />
+          {/* Product Name Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Product Name"
+            placeholderTextColor="#777"
+            value={form.name}
+            onChangeText={(text) => handleInputChange('name', text)}
+          />
 
-        {/* Product Price Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Price"
-          placeholderTextColor="#777"
-          value={form.price}
-          onChangeText={(text) => handleInputChange('price', text)}
-          keyboardType="numeric"
-        />
+          {/* Product Price Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Price"
+            placeholderTextColor="#777"
+            value={form.price}
+            onChangeText={(text) => handleInputChange('price', text)}
+            keyboardType="numeric"
+          />
 
-        {/* Product Description Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Description"
-          placeholderTextColor="#777"
-          value={form.description}
-          onChangeText={(text) => handleInputChange('description', text)}
-          multiline
-        />
+          {/* Product Description Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Description"
+            placeholderTextColor="#777"
+            value={form.description}
+            onChangeText={(text) => handleInputChange('description', text)}
+            multiline
+          />
 
-        {/* Product Quantity Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Quantity"
-          placeholderTextColor="#777"
-          value={form.quantity}
-          onChangeText={(text) => handleInputChange('quantity', text)}
-          keyboardType="numeric"
-        />
+          {/* Product Quantity Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Quantity"
+            placeholderTextColor="#777"
+            value={form.quantity}
+            onChangeText={(text) => handleInputChange('quantity', text)}
+            keyboardType="numeric"
+          />
 
-        {/* Submit Button */}
-        <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
-          <Text style={styles.addButtonText}>Add Product</Text>
-        </TouchableOpacity>
-      </View>
-     </ScrollView>
+          {/* Submit Button */}
+          <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
+            <Text style={styles.addButtonText}>Add Product</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </LinearGradient>
   );
 };
@@ -157,7 +157,6 @@ const AddProduct = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    // backgroundColor: Colors.background, // You can set a custom background color in Colors.js
     justifyContent: 'center',
     padding: 20,
   },
@@ -176,7 +175,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
-    borderRadius: 50, // If you want to make it circular
+    borderRadius: 50, // Circular image
   },
   title: {
     fontSize: 24,

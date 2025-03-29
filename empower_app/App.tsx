@@ -48,6 +48,10 @@ function App(): JSX.Element {
         setUser(null);
         storeData(null);
         return;
+      case 'UPDATE':
+        setUser(payload);
+        storeData(payload);
+        return;
       default:
         return;
     }
