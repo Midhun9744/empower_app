@@ -15,6 +15,7 @@ import LoginComponent from '../screens/generalscreens/login/login';
 import RegisterComponent from '../screens/generalscreens/register/register';
 import Colors from '../utils/colors';
 import HomestartComponent from '../screens/bottomstackscreens/homestack/homestart/homestart';
+import ProductpageComponent from '../screens/bottomstackscreens/homestack/productpage/productpage';
 import SellerRegisterComponent from '../screens/bottomstackscreens/sellerstack/sellerRegister/sellerRegister';
 import CompanyFormComponent from '../screens/bottomstackscreens/sellerstack/companyForm/companyForm';
 import SellerDashboardComponent from '../screens/bottomstackscreens/sellerstack/sellerDashboard/sellerDashboard';
@@ -23,7 +24,7 @@ import AddProductComponent from '../screens/bottomstackscreens/sellerstack/addPr
 import ViewProductComponent from '../screens/bottomstackscreens/sellerstack/viewProduct/viewProduct';
 import AccountViewComponent from '../screens/bottomstackscreens/accountstack/accountview/accountview';
 import EditProfileComponent from '../screens/bottomstackscreens/accountstack/editprofile/editprofile';
-// import CartComponent from '../screens/bottomstackscreens/orderstack/cart/cart';
+import CartComponent from '../screens/bottomstackscreens/orderstack/cart/cart';
 import LearnComponent from '../screens/bottomstackscreens/learnstack/learn/learn';
 
 // import SellerAttachment from '../screens/bottomstackscreens/sellerstack/';
@@ -169,6 +170,7 @@ export function HomeScreens() {
       }}>
       <HomeStack.Screen name="Home" component={HomeComponent} />
       <HomeStack.Screen name="Homestart" component={HomestartComponent} />
+      <HomeStack.Screen name="Productpage" component={ProductpageComponent} />
 
       {/* <HomeStack.Screen name="Send" component={SendOtpScreen} />
       <HomeStack.Screen name="Verify" component={VerifyOtpScreen} /> */}

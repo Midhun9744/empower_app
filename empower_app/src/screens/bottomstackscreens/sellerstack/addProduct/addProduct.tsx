@@ -99,7 +99,7 @@ const AddProduct = () => {
         <View style={styles.formContainer}>
           {/* Image at the top */}
           <Image
-            source={require('../../../../assets/images/avatar.png')} // Replace with your image URL
+            source={require('../../../../assets/images/seller1.jpg')} // Replace with your image URL
             style={styles.image}
           />
 
