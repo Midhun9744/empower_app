@@ -7,6 +7,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
 export type SellerStackParamList = {
   SellerDashboard: {} | undefined;
@@ -23,12 +24,16 @@ const SellerDashboard = () => {
   return (
     // LinearGradient applied to the entire screen
     <LinearGradient
-      colors={['#ffffff', '#abbaab']} // Gradient colors
-      style={styles.container}
-      start={{ x: 0, y: 0 }}  // Start of the gradient
-      end={{ x: 1, y: 1 }}    // End of the gradient
+      colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+              style={StyleSheet.absoluteFill}   // End of the gradient
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <BlurView
+            style={styles.blurContainer}
+            blurType="light"
+            blurAmount={20}
+            reducedTransparencyFallbackColor="white"
+          />
         {/* Profile Image Section */}
         <View style={styles.profileContainer}>
           <Image
@@ -91,12 +96,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
+  blurContainer: {
+    ...StyleSheet.absoluteFillObject,
+  },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
     marginBottom: 20,
     borderWidth: 2,
+    borderColor: '#ff9800',
     // borderColor: Colors.primary,
   },
   welcome: {
@@ -104,7 +113,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 20,
     textAlign: 'center',
-    color: '#333',
+    color: 'rgba(0,0,0,0.8)',
   },
   tabsContainer: {
     marginTop: 30,
@@ -115,6 +124,7 @@ const styles = StyleSheet.create({
   tabButton: {
     width: '80%', // Width of the button (80% of the container width)
     marginVertical: 10, // Add space between buttons
+    color: 'rgba(0,0,0,0.8)',
   },
   getStartedButton: {
     marginTop: 20,

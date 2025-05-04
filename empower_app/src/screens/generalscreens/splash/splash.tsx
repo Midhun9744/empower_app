@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {View, Text, Image, StyleSheet, Animated} from 'react-native';
 import Colors from '../../../utils/colors';
+import LinearGradient from 'react-native-linear-gradient';
 
 const SplashScreen = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -31,6 +32,10 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+              colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+              style={StyleSheet.absoluteFill}
+            />
       <Animated.Image
         source={require('../../../assets/images/logo.png')} // Update with your logo
         style={[
@@ -52,7 +57,7 @@ const SplashScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.primary,
+    // backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -64,7 +69,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'rgba(0,0,0,0.8)',
     marginTop: 20,
   },
 });

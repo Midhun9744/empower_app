@@ -53,7 +53,7 @@ const ViewProduct = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Loop through the products array and display each product */}
-      {products.slice(0, 10).map((product: any) => (
+      {products.slice(0, 100).map((product: any) => (
         <View key={product.PRODUCT_ID} style={styles.productCard}>
           {/* Product image */}
           <Image source={{ uri: product.PICTURES }} style={styles.productImage} />
@@ -62,7 +62,7 @@ const ViewProduct = () => {
           {/* Product description */}
           <Text style={styles.productDescription}>{product.DESCRIPTION}</Text>
           {/* Product price */}
-          <Text style={styles.productPrice}>${product.PRICE}</Text>
+          <Text style={styles.productPrice}>₹{product.PRICE}</Text>
           {/* Product quantity */}
           <Text style={styles.productQuantity}>Quantity: {product.QUANTITY}</Text>
           {/* Product like count */}

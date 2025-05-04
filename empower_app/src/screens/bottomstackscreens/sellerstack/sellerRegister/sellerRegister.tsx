@@ -1,10 +1,11 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect ,useState } from 'react';
 import { Text, StyleSheet, ScrollView } from 'react-native';
 import { UserContext } from '../../../../context/userContext';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
 // Defining navigation params type for navigation
 export type SellerStackParamList = {
@@ -16,10 +17,12 @@ const SellerRegister = () => {
   const { user } = useContext(UserContext); // Access user context to get the current user
   const { t } = useTranslation(); // Translation hook for multi-language support
   const nav = useNavigation<StackNavigationProp<SellerStackParamList>>(); // Navigation hook
-
+  const [loading, setLoading] = useState(false);
   // Check the user info on component mount and navigate accordingly
   useEffect(() => {
     const sellerId = user.info.seller_id;
+    console.log(sellerId);
+    console.log(user);
 
     if (sellerId === null || sellerId === undefined) {
       // If sellerId doesn't exist, navigate to the CompanyForm
@@ -32,15 +35,13 @@ const SellerRegister = () => {
 
   return (
     <LinearGradient
-      colors={['#ffffff', '#abbaab']} // Gradient background
-      style={styles.container}
-      start={{ x: 0, y: 0 }}  // Start of the gradient
-      end={{ x: 1, y: 1 }}    // End of the gradient
+      colors={['#f5d7db', '#dcc5f7', '#f0f0f0']} // Gradient background
+      style={styles.container}   // End of the gradient
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Apply LinearGradient inside form box */}
         <LinearGradient
-          colors={['#ffffff', '#abbaab']} // Same gradient as outside
+          colors={['#f5d7db', '#dcc5f7', '#f0f0f0']} // Same gradient as outside
           style={styles.formBox}
           start={{ x: 0, y: 0 }}  // Start of the gradient
           end={{ x: 1, y: 1 }}    // End of the gradient

@@ -8,13 +8,16 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { UserContext } from '../../../../context/userContext';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../../../../utils/colors';
 import { BASE_URL } from '../../../../utils/constants';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Updated for React Native CLI
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient'; // ➡️ added
+import { BlurView } from '@react-native-community/blur'; // ➡️ added
 
 export type AccountStackParamList = {
   Send: {} | undefined;
@@ -22,6 +25,8 @@ export type AccountStackParamList = {
   EditProfile: {} | undefined;
   AccountView: {} | undefined;
 };
+
+const { width, height } = Dimensions.get('window'); // screen size
 
 const EditProfile = () => {
   const { user, dispatchUserEvent } = useContext(UserContext);
@@ -50,7 +55,6 @@ const EditProfile = () => {
   };
 
   const handleUpdateProfile = async () => {
-    console.log(user.info);
     if (!form.firstName || !form.lastName || !form.phone) {
       Alert.alert('Error', 'All fields are required!');
       return;
@@ -65,22 +69,19 @@ const EditProfile = () => {
         PHONE: form.phone,
       };
 
-      const API_URL = BASE_URL+`/api/user/update/${user.info.USER_ID}`;
+      const API_URL = BASE_URL + `/api/user/update/${user.info.USER_ID}`;
 
       const response = await fetch(API_URL, {
-        method: 'PUT', // Or POST depending on your API
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          // Add any necessary authorization headers here
         },
         body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
-      console.log(data);
       if (!response.ok) {
         if (data.errors) {
-          // ✅ Display validation errors
           const errorMessages = data.errors.map(err => err.msg).join('\n');
           Alert.alert('Validation Error', errorMessages);
         } else if (data.error) {
@@ -93,76 +94,94 @@ const EditProfile = () => {
         return;
       }
 
-      console.log(data);
-           console.log(data.token);
-           Alert.alert('Success', 'profile updated successful!');
-           dispatchUserEvent('UPDATE', {
-             info: data.data,
-             token: data.token,
-           });
-           nav.navigate('AccountView'); 
-         } catch (error) {
-           Alert.alert('Error', 'Something went wrong. Please try again later.');
-          //  console.error('Login Error:', error);
-         }
-         console.log(user);
+      Alert.alert('Success', 'Profile updated successfully!');
+      dispatchUserEvent('UPDATE', {
+        info: data.data,
+        token: data.token,
+      });
+      nav.navigate('AccountView');
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Edit Profile</Text>
+    <View style={{ flex: 1 }}>
+      {/* Background Gradient */}
+      <LinearGradient
+        colors={['#f5d7db', '#dcc5f7', '#f0f0f0']} // your choice of colors
+        style={StyleSheet.absoluteFill}
+      />
 
-      {/* First Name */}
-      <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={22} color="#666" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="First Name"
-          value={form.firstName}
-          onChangeText={(text) => handleInputChange('firstName', text)}
-        />
-      </View>
+      {/* Blur Overlay */}
+      <BlurView
+        style={StyleSheet.absoluteFill}
+        blurType="light"
+        blurAmount={10}
+        reducedTransparencyFallbackColor="white"
+      />
 
-      {/* Last Name */}
-      <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={22} color="#666" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Last Name"
-          value={form.lastName}
-          onChangeText={(text) => handleInputChange('lastName', text)}
-        />
-      </View>
+      {/* Content */}
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Edit Profile</Text>
 
-      {/* Phone */}
-      <View style={styles.inputContainer}>
-        <Ionicons name="call-outline" size={22} color="#666" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Phone"
-          value={form.phone}
-          onChangeText={(text) => handleInputChange('phone', text)}
-          keyboardType="phone-pad"
-        />
-      </View>
+        {/* First Name */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={22} color="#666" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="First Name"
+            placeholderTextColor="#999"
+            value={form.firstName}
+            onChangeText={(text) => handleInputChange('firstName', text)}
+          />
+        </View>
 
-      {/* Update Button */}
-      <TouchableOpacity style={styles.button} onPress={handleUpdateProfile} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Update Profile</Text>}
-      </TouchableOpacity>
-    </ScrollView>
+        {/* Last Name */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={22} color="#666" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            placeholderTextColor="#999"
+            value={form.lastName}
+            onChangeText={(text) => handleInputChange('lastName', text)}
+          />
+        </View>
+
+        {/* Phone */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="call-outline" size={22} color="#666" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Phone"
+            placeholderTextColor="#999"
+            value={form.phone}
+            onChangeText={(text) => handleInputChange('phone', text)}
+            keyboardType="phone-pad"
+          />
+        </View>
+
+        {/* Update Button */}
+        <TouchableOpacity style={styles.button} onPress={handleUpdateProfile} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Update Profile</Text>}
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#f8f9fa',
     alignItems: 'center',
     padding: 20,
+    paddingBottom: 40,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#333',
     marginVertical: 20,
@@ -171,7 +190,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgb(255, 255, 255)',
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
@@ -185,18 +204,20 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
+    color: 'rgba(0,0,0,0.8)',
   },
   button: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 12,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    paddingVertical: 14,
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
-    shadowColor: '#000',
+    marginTop: 10,
+    // shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    // shadowOpacity: 0.2,
+    // shadowRadius: 4,
+    // elevation: 5,
   },
   buttonText: {
     color: '#fff',

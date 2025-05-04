@@ -1,100 +1,85 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Alert, Button, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BASE_URL } from '../../../../utils/constants';
-import { useRoute } from '@react-navigation/native'; // To access the passed productId from the navigation
-import { UserContext } from '../../../../context/userContext'; // Assuming UserContext exists to get user info
+import { useRoute } from '@react-navigation/native';
+import { UserContext } from '../../../../context/userContext'; // Correct import
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
-const Productpage = () => {
-  const [product, setProduct] = useState<any | null>(null); // State to store the product details
-  const [loading, setLoading] = useState<boolean>(true); // Loading state for the product
-  const [error, setError] = useState<string>(''); // Error state for handling API failures
-  const route = useRoute(); // Get the route object from the navigation
-  const { productId } = route.params; // Get the productId passed from the HomeStart screen
-  const { user } = useContext(UserContext); // Access user context if needed
-  const { t } = useTranslation(); // Access translations
-  const nav = useNavigation(); // Navigation hook to navigate to other pages
+const ProductPage = () => {
+  const [product, setProduct] = useState<any | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>(''); 
+  const [wishlistAdded, setWishlistAdded] = useState<boolean>(false);
 
-  // Fetch product details when the component mounts or productId changes
+  const route = useRoute();
+  const { productId } = route.params;
+  const { user, addToWishlist } = useContext(UserContext); // Use the context here
+  const { t } = useTranslation();
+  const nav = useNavigation();
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const API_URL = `${BASE_URL}/api/product/${productId}`; // API URL to get the product details by ID
-        const response = await fetch(API_URL, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // Add any necessary authorization headers here (e.g., Authorization: Bearer ${token})
-          },
-        });
-
+        const API_URL = `${BASE_URL}/api/product/${productId}`;
+        const response = await fetch(API_URL);
         const result = await response.json();
         if (response.ok) {
-          setProduct(result.product); // Set the fetched product data to state
+          setProduct(result.product);
         } else {
           throw new Error('Failed to load product details');
         }
       } catch (error) {
-        console.error('Error fetching product details:', error);
         setError('Failed to load product details');
       } finally {
-        setLoading(false); // Set loading to false after the request completes
+        setLoading(false);
       }
     };
 
-    fetchProductDetails(); // Fetch product details when the component mounts
-  }, [productId]); // Re-run the effect if the productId changes
+    fetchProductDetails();
+  }, [productId]);
 
-  if (loading) {
-    return <Text style={styles.loading}>{t('loading product details...')}</Text>; // Show loading message
-  }
+  if (loading) return <Text style={styles.loading}>{t('loading product details...')}</Text>;
+  if (error) return <Text style={styles.error}>{error}</Text>;
+  if (!product) return <Text style={styles.error}>{t('product not found')}</Text>;
 
-  if (error) {
-    return <Text style={styles.error}>{error}</Text>; // Show error message if loading fails
-  }
-
-  if (!product) {
-    return <Text style={styles.error}>{t('product not found')}</Text>; // Show error message if no product found
-  }
-
-  const handleAddToCart = () => {
-    console.log(`Product ${product.PRODUCT_ID} added to cart`);
-    // Handle add to cart logic here
-  };
-
-  const handleBuyNow = () => {
-    console.log(`Product ${product.PRODUCT_ID} purchased`);
-    // Handle buy now logic here
+  // Handle adding to wishlist
+  const handleAddToWishlist = () => {
+    if (user && addToWishlist) {
+      addToWishlist(product); // Add to wishlist
+      setWishlistAdded(true); // Toggle wishlist added state
+      console.log(`Product ${product.PRODUCT_ID} added to wishlist`);
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <LinearGradient
+              colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+              style={StyleSheet.absoluteFill}
+            />
       <View style={styles.productCard}>
-        {/* Product image */}
-        <Image source={{ uri: product.IMAGE_URL }} style={styles.productImage} />
-        {/* Product name */}
+        <BlurView
+                    style={styles.blurContainer}
+                    blurType="light"
+                    blurAmount={20}
+                    reducedTransparencyFallbackColor="white"
+                  />
+        <Image source={{ uri: product.PICTURES }} style={styles.productImage} />
         <Text style={styles.productName}>{product.NAME}</Text>
-        {/* Product description */}
-        <Text style={styles.productDescription}>{product.DESCRIPTION}</Text>
-        {/* Product price */}
-        <Text style={styles.productPrice}>${product.PRICE}</Text>
-        {/* Product quantity */}
+        <Text style={styles.productDescription}>About : {product.DESCRIPTION}</Text>
+        <Text style={styles.productPrice}>₹{product.PRICE}</Text>
         <Text style={styles.productQuantity}>{t('available')}: {product.QUANTITY}</Text>
-        {/* Product like count */}
-        <Text style={styles.productLikeCount}>{t('likes')}: {product.LIKE_COUNT}</Text>
 
-        {/* Add to Cart and Buy Now buttons */}
         <View style={styles.buttonContainer}>
+          <Button title={t('add to cart')} onPress={() => console.log('Add to cart')} />
+          <Button title={t('buy now')} onPress={() => nav.navigate('Buynow', { productId })} />
           <Button
-            title={t('add to cart')}
-            onPress={handleAddToCart}
-            color="#4CAF50"
-          />
-          <Button
-            title={t('buy now')}
-            onPress={handleBuyNow}
-            color="#f44336"
+            title={t('add to wishlist')}
+            onPress={handleAddToWishlist}
+            color={wishlistAdded ? '#ff9800' : '#ff5722'}
           />
         </View>
       </View>
@@ -108,19 +93,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f1f1',
     alignItems: 'center',
     padding: 20,
+    borderRadius: 42,
   },
   productCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#e5e7e9',
+    borderRadius: 42,
     padding: 20,
     marginBottom: 15,
     width: '100%',
-    height: 500,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
   },
   productImage: {
     width: '100%',
@@ -133,6 +113,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 12,
+  },
+  blurContainer: {
+    ...StyleSheet.absoluteFillObject,
   },
   productDescription: {
     fontSize: 16,
@@ -148,11 +131,6 @@ const styles = StyleSheet.create({
   productQuantity: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 12,
-  },
-  productLikeCount: {
-    fontSize: 14,
-    color: '#888',
     marginBottom: 12,
   },
   buttonContainer: {
@@ -172,4 +150,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Productpage;
+export default ProductPage;

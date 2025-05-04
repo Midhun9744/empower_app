@@ -1,10 +1,12 @@
-import React, { useContext } from 'react';
-import { Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Button } from 'react-native-paper';
+import React, { useState, useContext } from 'react';
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { UserContext } from '../../../../context/userContext';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur'; 
 
 export type ProfileStackParamList = {
   Send: {} | undefined;
@@ -12,129 +14,100 @@ export type ProfileStackParamList = {
 };
 
 const Faq = () => {
-  const { user } = useContext(UserContext);
-  const { t } = useTranslation();
-  const nav = useNavigation<StackNavigationProp<ProfileStackParamList>>();
+    const { user } = useContext(UserContext);
+    const { t } = useTranslation();
+    const nav = useNavigation<StackNavigationProp<ProfileStackParamList>>();
 
-  const [expanded, setExpanded] = React.useState<number | null>(null);
+    const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  const toggleAccordion = (index: number) => {
-    setExpanded(expanded === index ? null : index);
-  };
+    const faqData = [
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Welcome Message */}
-      <Text style={styles.welcome}>{t('welcome faq')}!</Text>
+        { question: 'How do I log in?', answer: 'You can log in using your email and password or via Google and Facebook authentication.' },
+        { question: 'How can I sell a product?', answer: 'Go to the selling section, click on "Sell Now," and follow the instructions to list your product.' },
+        // { question: 'How do I become a teacher?', answer: 'Register as an instructor by providing your details and course materials. Once approved, you can start teaching.' },
+        { question: 'How does learning work?', answer: 'You can browse courses, enroll in a course, and start learning at your own pace with video tutorials and exercises.' },
+        { question: 'How do I buy a product?', answer: 'Browse the marketplace, select the product you want, and proceed with payment to complete your purchase.' },
+    ];
 
-      {/* FAQ Section */}
-      <View style={styles.faqContainer}>
-        <Text style={styles.faqTitle}>{t('FAQ')}</Text>
+    const toggleExpand = (index: number) => {
+        setExpandedIndex(expandedIndex === index ? null : index);
+    };
 
-        {/* FAQ 1 */}
-        <TouchableOpacity onPress={() => toggleAccordion(0)}>
-          <View style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>{t('faq1.question')}</Text>
-          </View>
-        </TouchableOpacity>
-        {expanded === 0 && (
-          <View style={styles.faqAnswer}>
-            <Text style={styles.faqAnswerText}>{t('faq1.answer')}</Text>
-          </View>
-        )}
+    return (
+        <ScrollView contentContainerStyle={styles.container}>
+            <LinearGradient
+                          colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+                          style={StyleSheet.absoluteFill}
+                        />
+            <Text style={styles.welcome}>{t('Frequently Asked Questions')}</Text>
 
-        {/* FAQ 2 */}
-        <TouchableOpacity onPress={() => toggleAccordion(1)}>
-          <View style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>{t('faq2.question')}</Text>
-          </View>
-        </TouchableOpacity>
-        {expanded === 1 && (
-          <View style={styles.faqAnswer}>
-            <Text style={styles.faqAnswerText}>{t('faq2.answer')}</Text>
-          </View>
-        )}
-
-        {/* FAQ 3 */}
-        <TouchableOpacity onPress={() => toggleAccordion(2)}>
-          <View style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>{t('faq3.question')}</Text>
-          </View>
-        </TouchableOpacity>
-        {expanded === 2 && (
-          <View style={styles.faqAnswer}>
-            <Text style={styles.faqAnswerText}>{t('faq3.answer')}</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Get Started Button */}
-      {/* <Button
-        mode="contained"
-        style={styles.getStartedButton}
-        onPress={() => nav.navigate('Send')}>
-        {t('get started')}
-      </Button> */}
-    </ScrollView>
-  );
+            <View style={styles.faqContainer}>
+                <FlatList
+                    data={faqData}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item, index }) => (
+                        <View>
+                            <TouchableOpacity style={styles.faqItem} onPress={() => toggleExpand(index)}>
+                                <Text style={styles.faqQuestion}>{item.question}</Text>
+                                <Icon name={expandedIndex === index ? 'expand-less' : 'expand-more'} size={24} color="#000" />
+                            </TouchableOpacity>
+                            {expandedIndex === index && (
+                                <View style={styles.faqAnswer}>
+                                    <Text style={styles.faqAnswerText}>{item.answer}</Text>
+                                </View>
+                            )}
+                        </View>
+                    )}
+                />
+            </View>
+        </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    padding: 20,
-  },
-  welcome: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  faqContainer: {
-    width: '100%',
-    marginTop: 30,
-  },
-  faqTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FF6F61',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  faqItem: {
-    backgroundColor: '#F1F1F1',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  faqQuestion: {
-    fontSize: 18,
-    color: '#FF6F61',
-    fontWeight: 'bold',
-  },
-  faqAnswer: {
-    backgroundColor: '#FFE2E0',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-  },
-  faqAnswerText: {
-    fontSize: 16,
-    color: '#555',
-  },
-  getStartedButton: {
-    marginTop: 20,
-    width: '80%',
-    borderRadius: 8,
-  },
+    container: {
+        flexGrow: 1,
+        backgroundColor: '#fff',
+        padding: 16,
+    },
+    welcome: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+        color: '#000',
+    },
+    faqContainer: {
+        width: '100%',
+    },
+    faqItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: '#f8f8f8',
+        padding: 16,
+        borderRadius: 8,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#ddd',
+    },
+    faqQuestion: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    faqAnswer: {
+        backgroundColor: '#f1f1f1',
+        padding: 12,
+        marginBottom: 10,
+        borderRadius: 8,
+        borderLeftWidth: 4,
+        borderLeftColor: '#ff6f00',
+    },
+    faqAnswerText: {
+        fontSize: 14,
+        color: '#555',
+    },
 });
 
 export default Faq;

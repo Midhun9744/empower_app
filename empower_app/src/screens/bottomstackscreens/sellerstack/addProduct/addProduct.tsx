@@ -9,19 +9,22 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
 import { useNavigation } from '@react-navigation/native';
-import { UserContext } from '../../../../context/userContext'; // Import UserContext
+import { UserContext } from '../../../../context/userContext';
 import { StackNavigationProp } from '@react-navigation/stack';
-import Colors from '../../../../utils/colors'; // Assuming a Colors file is used
+import Colors from '../../../../utils/colors';
 import { BASE_URL } from '../../../../utils/constants';
 import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
 export type SellerStackParamList = {
   SellerDashboard: {} | undefined;
 };
 
 const AddProduct = () => {
-  const { user } = useContext(UserContext); // Access user from context
+  const { user } = useContext(UserContext);
   const nav = useNavigation<StackNavigationProp<SellerStackParamList>>();
 
   const [form, setForm] = useState({
@@ -29,10 +32,41 @@ const AddProduct = () => {
     price: '',
     description: '',
     quantity: '',
+    image: '',
   });
 
   const handleInputChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
+  };
+
+  const handleImagePick = async () => {
+    const options = {
+      mediaType: 'photo',
+      quality: 1,
+    };
+
+    launchImageLibrary(options, async (response) => {
+      if (response.didCancel) {
+        Alert.alert('Cancelled', 'Image selection cancelled');
+      } else if (response.errorMessage) {
+        Alert.alert('Error', response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        const imageUri = response.assets[0].uri;
+        setForm({ ...form, image: imageUri });
+      }
+    });
+  };
+
+  const uploadImageToFirebase = async (uri: string) => {
+    try {
+      const fileName = `products/${Date.now()}.jpg`;
+      const reference = storage().ref(fileName);
+      await reference.putFile(uri);
+      return await reference.getDownloadURL();
+    } catch (error) {
+      Alert.alert('Error', 'Image upload failed.');
+      return null;
+    }
   };
 
   const handleAddProduct = async () => {
@@ -41,19 +75,25 @@ const AddProduct = () => {
       return;
     }
 
-    // Validate if price and quantity are numbers
     if (isNaN(Number(form.price)) || isNaN(Number(form.quantity))) {
       Alert.alert('Error', 'Price and Quantity must be valid numbers');
       return;
     }
 
     try {
+      let imageUrl = '';
+      if (form.image) {
+        imageUrl = await uploadImageToFirebase(form.image);
+        console.log(imageUrl);
+      }
+
       const requestBody = {
         NAME: form.name,
         PRICE: form.price,
         DESCRIPTION: form.description,
         QUANTITY: form.quantity,
-        SELLER_ID: user.info.seller_id, // Get seller ID from context
+        SELLER_ID: user.info.seller_id,
+        PICTURES: imageUrl,
       };
 
       const API_URL = BASE_URL + '/api/product/add';
@@ -66,85 +106,39 @@ const AddProduct = () => {
 
       const data = await response.json();
       if (!response.ok) {
-        if (data.errors) {
-          const errorMessages = data.errors.map((err: any) => err.msg).join('\n');
-          Alert.alert('Validation Error', errorMessages);
-        } else if (data.error) {
-          Alert.alert('Error 1', data.error);
-        } else if (data.message) {
-          Alert.alert('Error 2', data.message);
-        } else {
-          Alert.alert('Error', 'Product addition failed');
-        }
+        Alert.alert('Error', data.message || 'Product addition failed');
         return;
       }
 
       Alert.alert('Success', 'Product added successfully!');
-      nav.navigate('SellerDashboard'); // Navigate to Seller Dashboard after success
+      nav.navigate('SellerDashboard');
     } catch (error) {
-      console.error('Product Addition Error:', error); 
-      Alert.alert('Error', 'Something went wrong. Please try again later  .');
-      // console.error('Product Addition Error:', error);
+      console.error('Product Addition Error:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
 
   return (
-    <LinearGradient
-      colors={['#ffffff', '#abbaab']} // Gradient background for the entire screen
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <LinearGradient  colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+            style={StyleSheet.absoluteFill}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.formContainer}>
-          {/* Image at the top */}
-          <Image
-            source={require('../../../../assets/images/seller1.jpg')} // Replace with your image URL
-            style={styles.image}
-          />
-
+          <BlurView
+                      style={styles.blurContainer}
+                      blurType="light"
+                      blurAmount={20}
+                      reducedTransparencyFallbackColor="white"
+                    />
+          <Image source={require('../../../../assets/images/seller1.jpg')} style={styles.image} />
           <Text style={styles.title}>Add Product</Text>
-
-          {/* Product Name Input */}
-          <TextInput
-            style={styles.input}
-            placeholder="Product Name"
-            placeholderTextColor="#777"
-            value={form.name}
-            onChangeText={(text) => handleInputChange('name', text)}
-          />
-
-          {/* Product Price Input */}
-          <TextInput
-            style={styles.input}
-            placeholder="Price"
-            placeholderTextColor="#777"
-            value={form.price}
-            onChangeText={(text) => handleInputChange('price', text)}
-            keyboardType="numeric"
-          />
-
-          {/* Product Description Input */}
-          <TextInput
-            style={styles.input}
-            placeholder="Description"
-            placeholderTextColor="#777"
-            value={form.description}
-            onChangeText={(text) => handleInputChange('description', text)}
-            multiline
-          />
-
-          {/* Product Quantity Input */}
-          <TextInput
-            style={styles.input}
-            placeholder="Quantity"
-            placeholderTextColor="#777"
-            value={form.quantity}
-            onChangeText={(text) => handleInputChange('quantity', text)}
-            keyboardType="numeric"
-          />
-
-          {/* Submit Button */}
+          <TextInput style={styles.input} placeholder="Product Name" value={form.name} onChangeText={(text) => handleInputChange('name', text)} />
+          <TextInput style={styles.input} placeholder="Price" value={form.price} onChangeText={(text) => handleInputChange('price', text)} keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="Description" value={form.description} onChangeText={(text) => handleInputChange('description', text)} multiline />
+          <TextInput style={styles.input} placeholder="Quantity" value={form.quantity} onChangeText={(text) => handleInputChange('quantity', text)} keyboardType="numeric" />
+          <TouchableOpacity style={styles.uploadButton} onPress={handleImagePick}>
+            <Text style={styles.uploadButtonText}>{form.image ? 'Image Selected' : 'Upload Product Image'}</Text>
+          </TouchableOpacity>
+          {form.image && <Image source={{ uri: form.image }} style={styles.previewImage} />}
           <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
             <Text style={styles.addButtonText}>Add Product</Text>
           </TouchableOpacity>
@@ -155,58 +149,19 @@ const AddProduct = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
+  container: { flexGrow: 1, justifyContent: 'center', padding: 20 },
+  blurContainer: {
+    ...StyleSheet.absoluteFillObject,
   },
-  formContainer: {
-    alignItems: 'center',
-    backgroundColor: Colors.white, // White background for the form
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-    borderRadius: 50, // Circular image
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.primary, // Use your primary color for the title
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9', // Light background for input fields
-  },
-  addButton: {
-    width: '100%',
-    backgroundColor: Colors.primary, // Primary color for button
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 15,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  formContainer: { alignItems: 'center', backgroundColor:  '#aeb6bf', borderRadius: 40, padding: 20, shadowOpacity: 0.1, shadowRadius: 5, elevation: 5 },
+  image: { width: 100, height: 100, marginBottom: 20, borderRadius: 50,borderColor: '#58d68d'},
+  title: { fontSize: 24, fontWeight: 'bold', color:'rgba(0,0,0,0.8)', marginBottom: 20 },
+  input: { width: '100%', height: 50, borderWidth: 1, borderColor: '#ddd', borderRadius: 8, paddingHorizontal: 15, fontSize: 16, marginBottom: 15, backgroundColor: '#f9f9f9' },
+  uploadButton: { width: '100%', backgroundColor: Colors.secondary, borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginTop: 10 },
+  uploadButtonText: { color: '#000000', fontSize: 16, fontWeight: 'bold' },
+  previewImage: { width: 100, height: 100, marginTop: 10, borderRadius: 8 },
+  addButton: { width: '100%', backgroundColor: 'rgba(0,0,0,0.8)', borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginTop: 15 },
+  addButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
 });
 
 export default AddProduct;

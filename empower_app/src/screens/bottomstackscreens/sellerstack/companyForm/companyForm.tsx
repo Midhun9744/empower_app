@@ -7,26 +7,68 @@ import {
   Alert,
   StyleSheet,
   ScrollView,
+  Image,
 } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../../../../utils/colors';
-import { UserContext } from '../../../../context/userContext'; // Import UserContext
+import { UserContext } from '../../../../context/userContext';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useTranslation } from 'react-i18next';
 import { BASE_URL } from '../../../../utils/constants';
+import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
 export type SellerStackParamList = {
   SellerDashboard: {} | undefined;
 };
 
 const CompanyForm = () => {
-  const { user } = useContext(UserContext); // Access user from context
+  const { user } = useContext(UserContext);
   const nav = useNavigation<StackNavigationProp<SellerStackParamList>>();
-  
+
   const [form, setForm] = useState({
     companyName: '',
     description: '',
+    profileImage: '',
   });
+
+  const handleInputChange = (key: string, value: string) => {
+    setForm({ ...form, [key]: value });
+  };
+
+  const handleImagePick = async () => {
+    const options = {
+      mediaType: 'photo',
+      quality: 1,
+    };
+
+    launchImageLibrary(options, async (response) => {
+      if (response.didCancel) {
+        Alert.alert('Cancelled', 'Image selection cancelled');
+      } else if (response.errorMessage) {
+        Alert.alert('Error', response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        const imageUri = response.assets[0].uri;
+        const imageUrl = await uploadImageToFirebase(imageUri);
+        if (imageUrl) {
+          setForm({ ...form, profileImage: imageUrl });
+        }
+      }
+    });
+  };
+
+  const uploadImageToFirebase = async (uri: string) => {
+    try {
+      const fileName = `seller_images/${Date.now()}.jpg`;
+      const reference = storage().ref(fileName);
+      await reference.putFile(uri);
+      return await reference.getDownloadURL();
+    } catch (error) {
+      Alert.alert('Error', 'Image upload failed.');
+      return null;
+    }
+  };
 
   const handleSubmit = async () => {
     if (!form.companyName || !form.description) {
@@ -34,19 +76,15 @@ const CompanyForm = () => {
       return;
     }
 
-    // if (!user || !user.id) {
-    //   Alert.alert('Error', 'User not authenticated');
-    //   return;
-    // }
-
     try {
       const requestBody = {
         COMPANY_NAME: form.companyName,
         DESCRIPTION: form.description,
-        USER_ID: user.info.USER_ID, // Get user ID from context
+        USER_ID: user.info.USER_ID,
+        PICTURES: form.profileImage,
       };
 
-      const API_URL = BASE_URL + '/api/seller/add'; // Adjust your API URL
+      const API_URL = BASE_URL + '/api/seller/add';
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -56,16 +94,7 @@ const CompanyForm = () => {
 
       const data = await response.json();
       if (!response.ok) {
-        if (data.errors) {
-          const errorMessages = data.errors.map(err => err.msg).join('\n');
-          Alert.alert('Validation Error', errorMessages);
-        } else if (data.error) {
-          Alert.alert('Validation Error', data.error);
-        } else if (data.message) {
-          Alert.alert('Error', data.message);
-        } else {
-          Alert.alert('Error', 'Registration failed');
-        }
+        Alert.alert('Error', data.message || 'Registration failed');
         return;
       }
 
@@ -79,6 +108,10 @@ const CompanyForm = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+       <LinearGradient
+              colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+              style={StyleSheet.absoluteFill}
+            />
       <View style={styles.formContainer}>
         <Text style={styles.title}>Register Your Company</Text>
 
@@ -87,7 +120,7 @@ const CompanyForm = () => {
           placeholder="Company Name"
           placeholderTextColor="#777"
           value={form.companyName}
-          onChangeText={text => setForm({ ...form, companyName: text })}
+          onChangeText={(text) => handleInputChange('companyName', text)}
         />
 
         <TextInput
@@ -95,12 +128,20 @@ const CompanyForm = () => {
           placeholder="Description"
           placeholderTextColor="#777"
           value={form.description}
-          onChangeText={text => setForm({ ...form, description: text })}
+          onChangeText={(text) => handleInputChange('description', text)}
         />
 
-        <TouchableOpacity
-          style={styles.registerButton}
-          onPress={handleSubmit}>
+        <TouchableOpacity style={styles.imagePicker} onPress={handleImagePick}>
+          <Text style={styles.imagePickerText}>
+            {form.profileImage ? 'Image Selected' : 'Upload Profile Image'}
+          </Text>
+        </TouchableOpacity>
+
+        {form.profileImage && (
+          <Image source={{ uri: form.profileImage }} style={styles.image} />
+        )}
+
+        <TouchableOpacity style={styles.registerButton} onPress={handleSubmit}>
           <Text style={styles.registerText}>Register</Text>
         </TouchableOpacity>
       </View>
@@ -116,6 +157,7 @@ const styles = StyleSheet.create({
   formContainer: {
     padding: 20,
     alignItems: 'center',
+    marginTop: 45,
   },
   title: {
     fontSize: 24,
@@ -125,17 +167,34 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: .4,
+    borderColor: '#000000',
     borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,
     marginBottom: 15,
-    justifyContent: 'center',
+  },
+  imagePicker: {
+    width: '100%',
+    backgroundColor: Colors.secondary,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  imagePickerText: {
+    color: '#000',
+    fontSize: 16,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 15,
   },
   registerButton: {
     width: '100%',
-    backgroundColor: Colors.primary,
+    backgroundColor: 'rgba(0,0,0,0.8)',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',

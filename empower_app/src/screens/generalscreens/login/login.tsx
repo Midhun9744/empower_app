@@ -19,6 +19,8 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Colors from '../../../utils/colors';
 import {BASE_URL} from '../../../utils/constants';
+import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
 export type AuthStackParamList = {
   Register: {} | undefined;
@@ -91,7 +93,15 @@ const LoginComponent = () => {
       style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.scrollView}>
+          <LinearGradient
+                        colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+                        style={StyleSheet.absoluteFill}
+                      />
           <View style={styles.container}>
+          <LinearGradient
+                        colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+                        style={StyleSheet.absoluteFill}
+                      />
             {/* Top Image Section */}
             <Image
               source={require('../../../assets/images/logo.png')}
@@ -101,13 +111,20 @@ const LoginComponent = () => {
 
             {/* Login Form */}
             <View style={styles.formContainer}>
+              
+            {/* <BlurView
+            style={styles.blurContainer}
+            blurType="light"
+            blurAmount={20}
+            reducedTransparencyFallbackColor="white"
+          /> */}
               <Text style={styles.title}>Login</Text>
 
               {/* Email Field */}
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="#777"
+                placeholderTextColor="#000000"
                 value={email}
                 onChangeText={setEmail}
               />
@@ -116,7 +133,7 @@ const LoginComponent = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Password"
-                placeholderTextColor="#777"
+                placeholderTextColor="#000000"
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
@@ -165,6 +182,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
+  blurContainer: {
+    ...StyleSheet.absoluteFillObject,
+  },
   formContainer: {
     flex: 1,
     padding: 20,
@@ -180,8 +200,8 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: .7,
+    borderColor: '#000000',
     borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,

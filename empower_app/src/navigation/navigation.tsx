@@ -11,11 +11,16 @@ import SettingsListComponent from '../screens/bottomstackscreens/settingstack/se
 import FaqComponent from '../screens/bottomstackscreens/settingstack/faq/faq';
 import WishlistComponent from '../screens/bottomstackscreens/settingstack/wishlist/wishlist';
 import LoanComponent from '../screens/bottomstackscreens/settingstack/loan/loan';
+import GuidenceComponent from '../screens/bottomstackscreens/settingstack/guidence/guidence';
+import LoanApllicationComponent from '../screens/bottomstackscreens/settingstack/loanapplication/loanapplication';
+import ChangepswdComponent from '../screens/bottomstackscreens/settingstack/changepswd/changepswd';
+import AddcourseComponent from '../screens/bottomstackscreens/settingstack/addcourse/addcourse';
 import LoginComponent from '../screens/generalscreens/login/login';
 import RegisterComponent from '../screens/generalscreens/register/register';
 import Colors from '../utils/colors';
 import HomestartComponent from '../screens/bottomstackscreens/homestack/homestart/homestart';
 import ProductpageComponent from '../screens/bottomstackscreens/homestack/productpage/productpage';
+import BuynowComponent from '../screens/bottomstackscreens/homestack/buynow/buynow';
 import SellerRegisterComponent from '../screens/bottomstackscreens/sellerstack/sellerRegister/sellerRegister';
 import CompanyFormComponent from '../screens/bottomstackscreens/sellerstack/companyForm/companyForm';
 import SellerDashboardComponent from '../screens/bottomstackscreens/sellerstack/sellerDashboard/sellerDashboard';
@@ -171,6 +176,7 @@ export function HomeScreens() {
       <HomeStack.Screen name="Home" component={HomeComponent} />
       <HomeStack.Screen name="Homestart" component={HomestartComponent} />
       <HomeStack.Screen name="Productpage" component={ProductpageComponent} />
+      <HomeStack.Screen name="Buynow" component={BuynowComponent} />
 
       {/* <HomeStack.Screen name="Send" component={SendOtpScreen} />
       <HomeStack.Screen name="Verify" component={VerifyOtpScreen} /> */}
@@ -276,10 +282,12 @@ export function ProfileScreens() {
         name="Wishlist"
         component={WishlistComponent}
       />
-      <ProfileStack.Screen
-        name="Loan"
-        component={LoanComponent}
-      />
+      <ProfileStack.Screen name="Loan" component={LoanComponent} />
+      <ProfileStack.Screen name="LoanApplication" component={LoanApllicationComponent} />
+      <ProfileStack.Screen name="Changepswd" component={ChangepswdComponent} />
+      <ProfileStack.Screen name="Guidence" component={GuidenceComponent} />
+      <ProfileStack.Screen name="Addcourse" component={AddcourseComponent} />
+
     </ProfileStack.Navigator>
   );
 }

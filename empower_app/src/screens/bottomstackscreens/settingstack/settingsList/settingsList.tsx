@@ -14,12 +14,15 @@ import {useTranslation} from 'react-i18next';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import {LanguageContext} from '../../../../context/languageContext';
+import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
 
 export type SettingStackParamList = {
   Faq: {} | undefined;
   Wishlist: {} | undefined;
   Loan: {} | undefined;
+  Changepswd: {} | undefined;
   
   
 };
@@ -33,8 +36,13 @@ const SettingsListComponent = () => {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+              colors={['#f5d7db', '#dcc5f7', '#f0f0f0']}
+              style={StyleSheet.absoluteFill}
+            />
       {/* Header */}
       <Appbar.Header style={styles.header}>
+        
         <Appbar.Content title="Settings" color={Colors.white} />
       </Appbar.Header>
 
@@ -69,6 +77,25 @@ const SettingsListComponent = () => {
           <List.Item
             title="loan"
             left={() => <Icon name="money" size={24} color="#007BFF" />}
+            right={() => <Icon name="chevron-right" size={24} color="#777" />}
+          />
+        </TouchableOpacity>
+        <Divider />
+        {/* change password */}
+        <TouchableOpacity onPress={() => nav.navigate('Changepswd')}>
+            {t('start')}
+          <List.Item
+            title="change password"
+            left={() => <Icon name="security" size={24} color="#007BFF" />}
+            right={() => <Icon name="chevron-right" size={24} color="#777" />}
+          />
+        </TouchableOpacity>
+        <Divider />
+        <TouchableOpacity onPress={() => nav.navigate('Addcourse')}>
+            {t('start')}
+          <List.Item
+            title="Add course"
+            left={() => <Icon name="book" size={24} color="#007BFF" />}
             right={() => <Icon name="chevron-right" size={24} color="#777" />}
           />
         </TouchableOpacity>
@@ -119,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    backgroundColor: Colors.primary, // Header background color
+    backgroundColor: 'rgba(0,0,0,0.4)', // Header background color
   },
   menuContainer: {
     paddingHorizontal: 20,
